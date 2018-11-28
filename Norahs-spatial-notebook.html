@@ -20,12 +20,10 @@
 <HR>
 <A NAME="1"></A>2018-11-09</A>- First meeting with Giuseppe: </li>
 
-
 - Run all from a folder call "scripts" that is backed up on github
-- Scripts are in order, and self-contained, so they have the R script within them
+- Scripts are in order, and self-contained, so they have the R scripts within them
 
 Initiallizing GitHub repository
-
 - set up the first push
 - then the commands are:
  1. git add --all
@@ -51,14 +49,13 @@ in the presentation they use bitbaket
 but you use git, any way it is the same concept.
 Before to push be sure that u run 
 
- git config --global user.name "Your Name"                     .... your git user name
- git config --global user.email "your.email@yale.edu"   ....your git e-mail address 
-
+git config --global user.name "Your Name"              ....your git user name
+git config --global user.email "your.email@yale.edu"   ....your git e-mail address 
 git remote add origin ssh...... see slide 25
 git push -u origin master ....   see slide 25
 
 #These steps in practice:
-ssh -Y -Z nps25@Grace.hpc.yale.edu
+ssh -Y nps25@Grace.hpc.yale.edu
 srun --pty -p interactive bash
 cd /home/nps25/scripts/GraceRep
 
@@ -68,17 +65,73 @@ git remote add origin ssh:git@github.com:saarman/GraceRep.git
 git push -u origin master
 
 Then, as I go:
-cd /home/nps25/scripts/GraceRep
+cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
 git commit -m "adding notebook"
 git push -u origin master
 
 <HR>
-<A NAME="3"></A>2018-11-28</A>- Task: Create spatial lines for each pairwise distance needed </li>
+<A NAME="3"></A>2018-11-28</A>- Task: Create vectors for each pairwise distance needed </li>
 
+#organize directories -- "G" for genetic connectivity, "H" for habitat suitability
+mkdir /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+mkdir /home/fas/caccone/nps25/project/GMODEL
+mkdir /home/fas/caccone/nps25/scripts/GraceRep/HMODEL
+mkdir /home/fas/caccone/nps25/project/HMODEL
 
+#Start with GMODEL
+srun --pty -p interactive bash
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 
+#First install the packages I will need:
+module load Apps/R/3.4.3-generic
+R
+install.packages("dismo")
+install.packages("XML")
+install.packages("maptools")
+install.packages("rgeos")
+install.packages("rasterVis")
+q()
 
+#Now create the R Script:
+###############################################
+cat << 'EOF' > 01a.CreateVectors.2018-11-28.R
+library(raster)
+library (dismo)
+library (XML)
+library (rgeos)
+library (maptools)
+library(sp)
+library(rasterVis)
+library(rgdal)
+library(car)
+#set working directory
+setwd("/home/fas/caccone/nps25/project/GMODEL")
+G.table <- read.table(file="dist_matrix.csv", sep=",", header=F) # ... load coordinates and Fst, etc from file
+G.coordinates <- rbind(c(G.table$V3,G.table$V4)) # ... converted into a spatial object
+G.points <- SpatialPoints(G.coordinates)  # ... converted into a spatial object
+plot(my.first.points)
+#Need to save the output in some way
+EOF
+###############################################
+
+#Now queue the R Script with bash:
+###############################################
+cat << 'EOF' > 01a.CreateVectors.2018-11-28.sh
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem 100g
+#SBATCH --output=01a.CreateVectors.2018-11-28.sh.log
+module load Apps/R/3.4.3-generic; R 01a.CreateVectors.2018-11-28.R
+EOF
+###############################################
+sbatch 01a.CreateVectors.2018-11-28.sh
+
+cd /home/fas/caccone/nps25/scripts/GraceRep/
+git add --all
+git commit -m "2018-11-28 practicing R"
+git push -u origin master
 
 </pre>
 </html>
