@@ -89,9 +89,9 @@ cat << 'EOF' > 01a.CreateVectors.2018-11-28.R
 
 #R Script: Note that this is saved locally as "/Users/Norah/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-PopGen/LoadSpatialLines.R"
 ###############################################
-#First install packages:
+#First install packages: These only seem to install in temp file, can we get them to last?
 install.packages("sp", repos="https://mirrors.sorengard.com/cran/")
-install.packages("spatstat")
+install.packages("spatstat", repos="https://mirrors.sorengard.com/cran/")
 
 #now load packages
 library("sp")
@@ -167,7 +167,8 @@ cat << 'EOF' > 01a.CreateVectors.2018-11-28.sh
 #SBATCH --cpus-per-task=1
 #SBATCH --mem 100g
 #SBATCH --output=01a.CreateVectors.2018-11-28.sh.log
-module load Apps/R/3.4.3-generic; R 01a.CreateVectors.2018-11-28.R
+module load Apps/R/3.4.3-generic
+R 01a.CreateVectors.2018-11-28.R
 EOF
 ###############################################
 sbatch 01a.CreateVectors.2018-11-28.sh
