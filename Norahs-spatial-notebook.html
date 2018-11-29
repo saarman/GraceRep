@@ -83,14 +83,11 @@ mkdir /home/fas/caccone/nps25/project/HMODEL
 srun --pty -p interactive bash
 cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 
-
-
 #Now create the R Script:
 ###############################################
 cat << 'EOF' > 01a.CreateVectors.2018-11-28.R
 
-
-#R Script:
+#R Script: Note that this is saved locally as "/Users/Norah/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-PopGen/LoadSpatialLines.R"
 ###############################################
 #First install packages:
 install.packages("sp", repos="https://mirrors.sorengard.com/cran/")
@@ -158,7 +155,7 @@ summary(spatial.p)
 
 plot(spatial.p)
 
-#Need to save the output in some way
+#Need to save the output in some way since this will not be interactive in final form
 EOF
 ###############################################
 
