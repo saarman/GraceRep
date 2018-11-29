@@ -83,34 +83,81 @@ mkdir /home/fas/caccone/nps25/project/HMODEL
 srun --pty -p interactive bash
 cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 
-#First install the packages I will need:
-module load Apps/R/3.4.3-generic
-R
-install.packages("dismo")
-install.packages("XML")
-install.packages("maptools")
-install.packages("rgeos")
-install.packages("rasterVis")
-q()
+
 
 #Now create the R Script:
 ###############################################
 cat << 'EOF' > 01a.CreateVectors.2018-11-28.R
-library(raster)
-library (dismo)
-library (XML)
-library (rgeos)
-library (maptools)
-library(sp)
-library(rasterVis)
-library(rgdal)
-library(car)
+
+
+#R Script:
+###############################################
+#First install packages:
+install.packages("sp", repos="https://mirrors.sorengard.com/cran/")
+install.packages("spatstat")
+
+#now load packages
+library("sp")
+library("spatstat")
+library("maptools")
+
 #set working directory
 setwd("/home/fas/caccone/nps25/project/GMODEL")
-G.table <- read.table(file="dist_matrix.csv", sep=",", header=F) # ... load coordinates and Fst, etc from file
-G.coordinates <- rbind(c(G.table$V3,G.table$V4)) # ... converted into a spatial object
-G.points <- SpatialPoints(G.coordinates)  # ... converted into a spatial object
-plot(my.first.points)
+
+#One way to do it is to use the coordinates function:
+G.table <- read.table(file="dist_matrix.csv", sep=",", header=T) #-> ... load coordinates and Fst, etc from file 
+coordinates(G.table) <- c("long1", "lat1") #->
+coordinates1 <- coordinates(G.table) #->
+plot(coordinates1)
+
+#Another way to do it is with SpatialPoints
+G.table <- read.table(file="dist_matrix.csv", sep=",", header=T)  #->
+
+G.coordinates1 <- G.table[,c(5,3)] #-> ... select the correct collumns 
+G.points1 <- SpatialPoints(G.coordinates1)  #-> ... converted into a spatial object
+plot(G.points1)
+
+summary(G.points1)
+is.projected(G.points1)
+crs.geo <- CRS("+init=EPSG:32633 +datum=WGS84") #-> ... add coordinate system
+crs.geo
+proj4string(G.points1) <- crs.geo  #-> define projection system of our data
+summary(G.points1)
+is.projected(G.points1)
+
+G.coordinates2 <- G.table[,c(6,4)] #->
+G.points2 <- SpatialPoints(G.coordinates2) #->
+plot(G.points2)
+
+summary(G.points2)
+is.projected(G.points2)
+crs.geo <- CRS("+init=EPSG:32633 +datum=WGS84") #-> ... add coordinate system
+proj4string(G.points2) <- crs.geo  #-> define projection system of our data
+summary(G.points2)
+is.projected(G.points2)
+
+#Now a way to create lines from table --
+#create dataframes of begin and end coordinates:
+G.table <- read.table(file="dist_matrix.csv", sep=",", header=T) #-> ... load coordinates and Fst, etc from file
+
+begin.table <- G.table[,c(5,3)] #->
+begin.coord <- begin.table #->
+coordinates(begin.coord) <- c("long1", "lat1") #->
+
+end.table <- G.table[,c(6,4)] #->
+end.coord <- end.table #->
+coordinates(end.coord) <- c("long2", "lat2") #->
+
+p <- psp(begin.table[,1], begin.table[,2], end.table[,1], end.table[,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2])))) #->
+plot(p)
+
+spatial.p <- as(p, "SpatialLines") #->
+crs.geo <- CRS("+init=EPSG:32633 +datum=WGS84") #-> ... add coordinate system
+proj4string(spatial.p) <- crs.geo  #-> define projection system of our data
+summary(spatial.p)
+
+plot(spatial.p)
+
 #Need to save the output in some way
 EOF
 ###############################################
@@ -130,7 +177,7 @@ sbatch 01a.CreateVectors.2018-11-28.sh
 
 cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
-git commit -m "2018-11-28 practicing R"
+git commit -m "2018-11-29 more practice in R"
 git push -u origin master
 
 </pre>
