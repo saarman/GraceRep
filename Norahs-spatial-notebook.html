@@ -79,12 +79,20 @@ mkdir /home/fas/caccone/nps25/project/GMODEL
 mkdir /home/fas/caccone/nps25/scripts/GraceRep/HMODEL
 mkdir /home/fas/caccone/nps25/project/HMODEL
 
-#Start with GMODEL
-srun --pty -p interactive bash
-cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+#Install packages
+srun --pty --x11 -p interactive bash
+module load Apps/R/3.3.2-generic
 
+#IN R:
+install.packages("sp", repos="https://mirrors.sorengard.com/cran/")
+install.packages("spatstat", repos="https://mirrors.sorengard.com/cran/")
+install.packages("maptools", repos="https://mirrors.sorengard.com/cran/")
+install.packages("raster", repos="https://mirrors.sorengard.com/cran/")
+
+###############################################
 #Now create the R Script:
 ###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 cat << 'EOF' > 01a.CreateSpatialLines.2018-11-30.R
 
 #R Script: Note that this is also tested and saved locally as "/Users/Norah/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-PopGen/LoadSpatialLines.R"
@@ -154,13 +162,23 @@ summary(spatial.p)
 plot(spatial.p)
 
 save.image("01a.CreateSpatialLines.2018-11-30.Rdata")
+
+#To load the saved image later:
+# library("sp")
+# library("spatstat")
+# library("maptools")
+# setwd("/home/fas/caccone/nps25/project/GMODEL")
 # load("01a.CreateSpatialLines.2018-11-30.Rdata")
+# summary(spatial.p)
+# plot(p)
+# plot(spatial.p)
 ###############################################
 EOF
 
-#Now queue the R Script with slurm:
-cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 ###############################################
+#Now queue the R Script with slurm:
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 cat << 'EOF' > 01a.CreateSpatialLines.2018-11-30.R.sh
 #!/bin/bash
 #SBATCH -p day 
@@ -168,9 +186,8 @@ cat << 'EOF' > 01a.CreateSpatialLines.2018-11-30.R.sh
 #SBATCH -t 24:00:00
 #SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stdout/01a.CreateSpatialLines.2018-11-30.R.sh.%J.out
 #SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stderr/01a.CreateSpatialLines.2018-11-30.R.sh.%J.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=email
-#SBATCH --job-name=01a.CreateSpatialLines.sh
+#SBATCH --output=01a.CreateSpatialLines.2018-11-30.R.sh.log
+#SBATCH --job-name=01a.CreateSpatialLines.2018-11-30.R.sh
 #sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh
 
 #export MERIT=/project/fas/sbsc/ga254/grace0.grace.hpc.yale.internal/dataproces/MERIT
@@ -187,6 +204,7 @@ cat 01a.CreateSpatialLines.2018-11-30.R >> 01a.CreateSpatialLines.2018-11-30.R.s
 echo "EOF" >> 01a.CreateSpatialLines.2018-11-30.R.sh
 ###############################################
 sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh.log
 
 #commit your most recent work:
 cd /home/fas/caccone/nps25/scripts/GraceRep/

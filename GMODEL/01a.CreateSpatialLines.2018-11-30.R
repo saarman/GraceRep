@@ -66,5 +66,14 @@ summary(spatial.p)
 plot(spatial.p)
 
 save.image("01a.CreateSpatialLines.2018-11-30.Rdata")
+
+#To load the saved image later:
+# library("sp")
+# library("spatstat")
+# library("maptools")
+# setwd("/home/fas/caccone/nps25/project/GMODEL")
 # load("01a.CreateSpatialLines.2018-11-30.Rdata")
+# summary(spatial.p)
+# plot(p)
+# plot(spatial.p)
 ###############################################

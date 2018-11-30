@@ -4,9 +4,8 @@
 #SBATCH -t 24:00:00
 #SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stdout/01a.CreateSpatialLines.2018-11-30.R.sh.%J.out
 #SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stderr/01a.CreateSpatialLines.2018-11-30.R.sh.%J.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=email
-#SBATCH --job-name=01a.CreateSpatialLines.sh
+#SBATCH --output=01a.CreateSpatialLines.2018-11-30.R.sh.log
+#SBATCH --job-name=01a.CreateSpatialLines.2018-11-30.R.sh
 #sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh
 
 #export MERIT=/project/fas/sbsc/ga254/grace0.grace.hpc.yale.internal/dataproces/MERIT
@@ -85,6 +84,15 @@ summary(spatial.p)
 plot(spatial.p)
 
 save.image("01a.CreateSpatialLines.2018-11-30.Rdata")
+
+#To load the saved image later:
+# library("sp")
+# library("spatstat")
+# library("maptools")
+# setwd("/home/fas/caccone/nps25/project/GMODEL")
 # load("01a.CreateSpatialLines.2018-11-30.Rdata")
+# summary(spatial.p)
+# plot(p)
+# plot(spatial.p)
 ###############################################
 EOF

@@ -1,0 +1,137 @@
+> 
+> #R Script: Note that this is also tested and saved locally as "/Users/Norah/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-PopGen/LoadSpatialLines.R"
+> ###############################################
+> #source(01a.CreateSpatialLines.2018-11-30.R)
+> 
+> #First install packages in interactive mode, then load packages:
+> library("sp")
+> library("spatstat")
+Loading required package: spatstat.data
+Loading required package: nlme
+Loading required package: rpart
+
+spatstat 1.57-1       (nickname: ‘Cartoon Physics’) 
+For an introduction to spatstat, type ‘beginner’ 
+
+
+Note: R version 3.3.2 (2016-10-31) is more than 9 months old; we strongly recommend upgrading to the latest version
+> library("maptools")
+Checking rgeos availability: FALSE
+ 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
+ 	which has a restricted licence. It is disabled by default;
+ 	to enable gpclib, type gpclibPermit()
+> 
+> #set working directory
+> setwd("/home/fas/caccone/nps25/project/GMODEL")
+> 
+> #One way to do it is to use the coordinates function:
+> G.table <- read.table(file="dist_matrix.csv", sep=",", header=T) #-> ... load coordinates and Fst, etc from file 
+> coordinates(G.table) <- c("long1", "lat1") #->
+> coordinates1 <- coordinates(G.table) #->
+> plot(coordinates1)
+> 
+> #Another way to do it is with SpatialPoints
+> G.table <- read.table(file="dist_matrix.csv", sep=",", header=T)  #->
+> 
+> G.coordinates1 <- G.table[,c(5,3)] #-> ... select the correct collumns 
+> G.points1 <- SpatialPoints(G.coordinates1)  #-> ... converted into a spatial object
+> plot(G.points1)
+> 
+> summary(G.points1)
+Object of class SpatialPoints
+Coordinates:
+           min       max
+long1 30.27996 34.509450
+lat1  -0.59303  3.692197
+Is projected: NA 
+proj4string : [NA]
+Number of points: 1645
+> is.projected(G.points1)
+[1] NA
+> crs.geo <- CRS("+init=EPSG:32633 +datum=WGS84") #-> ... add coordinate system
+> crs.geo
+CRS arguments: +init=EPSG:32633 +datum=WGS84 
+> proj4string(G.points1) <- crs.geo  #-> define projection system of our data
+> summary(G.points1)
+Object of class SpatialPoints
+Coordinates:
+           min       max
+long1 30.27996 34.509450
+lat1  -0.59303  3.692197
+Is projected: TRUE 
+proj4string : [+init=EPSG:32633 +datum=WGS84]
+Number of points: 1645
+> is.projected(G.points1)
+[1] TRUE
+> 
+> G.coordinates2 <- G.table[,c(6,4)] #->
+> G.points2 <- SpatialPoints(G.coordinates2) #->
+> plot(G.points2)
+> 
+> summary(G.points2)
+Object of class SpatialPoints
+Coordinates:
+          min       max
+long2 30.5465 34.509450
+lat2  -0.8040  3.692197
+Is projected: NA 
+proj4string : [NA]
+Number of points: 1645
+> is.projected(G.points2)
+[1] NA
+> crs.geo <- CRS("+init=EPSG:32633 +datum=WGS84") #-> ... add coordinate system
+> proj4string(G.points2) <- crs.geo  #-> define projection system of our data
+> summary(G.points2)
+Object of class SpatialPoints
+Coordinates:
+          min       max
+long2 30.5465 34.509450
+lat2  -0.8040  3.692197
+Is projected: TRUE 
+proj4string : [+init=EPSG:32633 +datum=WGS84]
+Number of points: 1645
+> is.projected(G.points2)
+[1] TRUE
+> 
+> #Now a way to create lines from table --
+> #create dataframes of begin and end coordinates:
+> G.table <- read.table(file="dist_matrix.csv", sep=",", header=T) #-> ... load coordinates and Fst, etc from file
+> 
+> begin.table <- G.table[,c(5,3)] #->
+> begin.coord <- begin.table #->
+> coordinates(begin.coord) <- c("long1", "lat1") #->
+> 
+> end.table <- G.table[,c(6,4)] #->
+> end.coord <- end.table #->
+> coordinates(end.coord) <- c("long2", "lat2") #->
+> 
+> p <- psp(begin.table[,1], begin.table[,2], end.table[,1], end.table[,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2])))) #->
+> plot(p)
+> 
+> spatial.p <- as(p, "SpatialLines") #->
+> crs.geo <- CRS("+init=EPSG:32633 +datum=WGS84") #-> ... add coordinate system
+> proj4string(spatial.p) <- crs.geo  #-> define projection system of our data
+> summary(spatial.p)
+Object of class SpatialLines
+Coordinates:
+       min       max
+x 30.27996 34.509450
+y -0.80400  3.692197
+Is projected: TRUE 
+proj4string : [+init=EPSG:32633 +datum=WGS84]
+> 
+> plot(spatial.p)
+> 
+> save.image("01a.CreateSpatialLines.2018-11-30.Rdata")
+> 
+> #To load the saved image later:
+> # library("sp")
+> # library("spatstat")
+> # library("maptools")
+> # setwd("/home/fas/caccone/nps25/project/GMODEL")
+> # load("01a.CreateSpatialLines.2018-11-30.Rdata")
+> # summary(spatial.p)
+> # plot(p)
+> # plot(spatial.p)
+> ###############################################
+> 
