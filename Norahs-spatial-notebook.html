@@ -206,6 +206,22 @@ echo "EOF" >> 01a.CreateSpatialLines.2018-11-30.R.sh
 sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh
 cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh.log
 
+#Then take a look at the Rdata output:
+srun --pty --x11 -p interactive bash
+module load Apps/R/3.3.2-generic
+R
+
+#In R:
+library("sp")
+library("spatstat")
+library("maptools")
+setwd("/home/fas/cacc
+load("01a.CreateSpati
+summary(spatial.p)
+plot(p)
+plot(spatial.p)
+
+
 #commit your most recent work:
 cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
