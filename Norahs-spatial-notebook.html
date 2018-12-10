@@ -176,6 +176,16 @@ save.image("01a.CreateSpatialLines.2018-11-30.Rdata")
 EOF
 
 ###############################################
+#Test the R Script:
+###############################################
+srun --pty --x11 -p interactive bash
+module load Apps/R/3.3.2-generic
+R
+
+#In R:
+source("/gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R")
+
+###############################################
 #Now queue the R Script with slurm:
 ###############################################
 cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
@@ -206,7 +216,12 @@ echo "EOF" >> 01a.CreateSpatialLines.2018-11-30.R.sh
 sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh
 cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh.log
 
+
+
+
+###############################################
 #Then take a look at the Rdata output:
+###############################################
 srun --pty --x11 -p interactive bash
 module load Apps/R/3.3.2-generic
 R
@@ -221,6 +236,34 @@ summary(spatial.p)
 plot(p)
 plot(spatial.p)
 
+
+#commit your most recent work:
+cd /home/fas/caccone/nps25/scripts/GraceRep/
+git add --all
+git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
+git push -u origin master
+
+
+<HR>
+<A NAME="4"></A>2018-12-10</A>- Task: Get aridity layer ready for distance estimates</li>
+
+#Following Evie's code: https://github.com/evlynpless/MOSQLAND/blob/master/ARIDITY
+
+###############################################
+#Copy the file from Giuseppe's folder, where it has already been prepared fully:
+###############################################
+mkdir /gpfs/loomis/home.grace/fas/caccone/nps25/project/ARIDITY
+mkdir /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/ARIDITY
+cd /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/ARIDITY
+cat << 'EOF' > 01a.copyTIF.2018-12-10.sh
+#!/bin/bash
+#SBATCH --output=01a.copyTIF.2018-12-10.sh.log
+cp /gpfs/loomis/home.grace/fas/sbsc/ga254/grace0.grace.hpc.yale.internal/dataproces/PET_ARID/ARIDITY/AI_annual.tif /gpfs/loomis/home.grace/fas/caccone/nps25/project/ARIDITY/
+EOF
+
+sbatch 01a.copyTIF.2018-12-10.sh
+cat 01a.copyTIF.2018-12-10.sh.log 
+#I don't think I have access to Giuseppe's files...
 
 #commit your most recent work:
 cd /home/fas/caccone/nps25/scripts/GraceRep/
