@@ -217,8 +217,6 @@ sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.Cre
 cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/01a.CreateSpatialLines.2018-11-30.R.sh.log
 
 
-
-
 ###############################################
 #Then take a look at the Rdata output:
 ###############################################
@@ -236,13 +234,13 @@ summary(spatial.p)
 plot(p)
 plot(spatial.p)
 
-
+###############################################
 #commit your most recent work:
+###############################################
 cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
 git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
 git push -u origin master
-
 
 <HR>
 <A NAME="4"></A>2018-12-10</A>- Task: Get aridity layer ready for distance estimates</li>
@@ -265,11 +263,14 @@ sbatch 01a.copyTIF.2018-12-10.sh
 cat 01a.copyTIF.2018-12-10.sh.log 
 #I don't think I have access to Giuseppe's files...
 
+###############################################
 #commit your most recent work:
+###############################################
 cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
 git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
 git push -u origin master
+
 
 </pre>
 </html>
