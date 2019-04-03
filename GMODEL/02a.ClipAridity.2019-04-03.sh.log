@@ -1,0 +1,9 @@
+/var/spool/slurmd/job29254791/slurm_script: line 15: gdal_translate: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 16: pksetmask: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 17: gdal_translate: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 21: gdal_translate: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 22: pksetmask: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 23: gdal_translate: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 27: gdal_translate: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 28: pksetmask: command not found
+/var/spool/slurmd/job29254791/slurm_script: line 29: gdal_translate: command not found

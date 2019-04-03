@@ -243,34 +243,95 @@ git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
 git push -u origin master
 
 <HR>
-<A NAME="4"></A>2018-12-10</A>- Task: Get aridity layer ready for distance estimates</li>
+<A NAME="4"></A>2018-12-10</A>- Task: Clip layers to Uganda and Western Kenya</li>
 
-#Following Evie's code: https://github.com/evlynpless/MOSQLAND/blob/master/ARIDITY
+#Following Evie's code https://github.com/evlynpless/MOSQLAND
+
 
 ###############################################
-#Copy the file from Giuseppe's folder, where it has already been prepared fully:
+#ARIDITY:
 ###############################################
-mkdir /gpfs/loomis/home.grace/fas/caccone/nps25/project/ARIDITY
-mkdir /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/ARIDITY
-cd /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/ARIDITY
-cat << 'EOF' > 01a.copyTIF.2018-12-10.sh
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 02a.ClipAridity.2019-04-03.sh
 #!/bin/bash
-#SBATCH --output=01a.copyTIF.2018-12-10.sh.log
-cp /gpfs/loomis/home.grace/fas/sbsc/ga254/grace0.grace.hpc.yale.internal/dataproces/PET_ARID/ARIDITY/AI_annual.tif /gpfs/loomis/home.grace/fas/caccone/nps25/project/ARIDITY/
+#SBATCH -p day 
+#SBATCH -n 1 -c 1  -N 1  
+#SBATCH -t 24:00:00
+#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stdout/02a.ClipAridity.2019-04-03.sh.out
+#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stderr/02a.ClipAridity.2019-04-03.sh.err
+#SBATCH --output=02a.ClipAridity.2019-04-03.sh.log
+#SBATCH --job-name=02a.ClipAridity.2019-04-03.sh
+## sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ARIDITY
+OUTDIR=/project/caccone/nps25/project/RASTERS/UgandaKenyaClips
+RASTERNAME=AI_annual
+CLIPNAME=UgandaKenyaClip
+gdal_translate  -projwin -4.8 42.5 4.73 28.6  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
+gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
 EOF
 
-sbatch 01a.copyTIF.2018-12-10.sh
-cat 01a.copyTIF.2018-12-10.sh.log 
-#I don't think I have access to Giuseppe's files...
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+
+
+###############################################
+#ARIDITY:
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+mkdir /project/caccone/nps25/project/RASTERS/UgandaKenyaClips
+mkdir /project/caccone/nps25/project/RASTERS/UgandaClips
+mkdir /project/caccone/nps25/project/RASTERS/KenyaClips
+cat << 'EOF' > 02a.ClipAridity.2019-04-03.sh
+#!/bin/bash
+#SBATCH -p day 
+#SBATCH -n 1 -c 1  -N 1  
+#SBATCH -t 24:00:00
+#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stdout/02a.ClipAridity.2019-04-03.sh.out
+#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stderr/02a.ClipAridity.2019-04-03.sh.err
+#SBATCH --output=02a.ClipAridity.2019-04-03.sh.log
+#SBATCH --job-name=02a.ClipAridity.2019-04-03.sh
+## sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ARIDITY
+RASTERNAME=AI_annual
+
+CLIPNAME=UgandaKenyaClip
+OUTDIR=/project/caccone/nps25/project/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -4.8 42.5 4.73 28.6  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
+gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=UgandaClip
+OUTDIR=/project/caccone/nps25/project/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -1.5 35.4 4.73 28.6  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
+gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=KenyaClip
+OUTDIR=/project/caccone/nps25/project/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -4.8 42.5 4.73 33.7  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
+gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+
+#Submitted batch job 29254791
+
+
+
+
+
+
 
 ###############################################
 #commit your most recent work:
 ###############################################
 cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
-git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
+git commit -m "Clipping scripts"
 git push -u origin master
-
 
 </pre>
 </html>
