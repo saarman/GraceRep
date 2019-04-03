@@ -4,6 +4,7 @@
 ##SBATCH -t 24:00:00
 #SBATCH --output=02a.ClipAridity.2019-04-03.sh.log
 #SBATCH --job-name=02a.ClipAridity.2019-04-03.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/ARIDITY
 ##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
 ##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh.log
 INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ARIDITY
