@@ -243,86 +243,309 @@ git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
 git push -u origin master
 
 <HR>
-<A NAME="4"></A>2018-12-10</A>- Task: Clip layers to Uganda and Western Kenya</li>
+<A NAME="4"></A>2019-04-03</A>- Task: Clip layers to Uganda and Kenya</li>
+#NOTE: I copied Giuseppe's .bashrc file to my home directory so that the standard modules are loaded every time.
 
 #Following Evie's code https://github.com/evlynpless/MOSQLAND
 
+srun --pty --x11 -p interactive bash
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+mkdir /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips
+mkdir /project/fas/caccone/nps25/RASTERS/UgandaClips
+mkdir /project/fas/caccone/nps25/RASTERS/KenyaClips
+
+
 
 ###############################################
-#ARIDITY:
+#ARIDITY:  source of data https://github.com/evlynpless/MOSQLAND/blob/master/ARIDITY/sc01_cp_aridity.sh
 ###############################################
 cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 cat << 'EOF' > 02a.ClipAridity.2019-04-03.sh
 #!/bin/bash
 #SBATCH -p day 
-#SBATCH -n 1 -c 1  -N 1  
-#SBATCH -t 24:00:00
-#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stdout/02a.ClipAridity.2019-04-03.sh.out
-#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stderr/02a.ClipAridity.2019-04-03.sh.err
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
 #SBATCH --output=02a.ClipAridity.2019-04-03.sh.log
 #SBATCH --job-name=02a.ClipAridity.2019-04-03.sh
-## sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
-INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ARIDITY
-OUTDIR=/project/caccone/nps25/project/RASTERS/UgandaKenyaClips
-RASTERNAME=AI_annual
-CLIPNAME=UgandaKenyaClip
-gdal_translate  -projwin -4.8 42.5 4.73 28.6  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
-pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
-gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
-EOF
-
-cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
-sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
-
-
-###############################################
-#ARIDITY:
-###############################################
-cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
-mkdir /project/caccone/nps25/project/RASTERS/UgandaKenyaClips
-mkdir /project/caccone/nps25/project/RASTERS/UgandaClips
-mkdir /project/caccone/nps25/project/RASTERS/KenyaClips
-cat << 'EOF' > 02a.ClipAridity.2019-04-03.sh
-#!/bin/bash
-#SBATCH -p day 
-#SBATCH -n 1 -c 1  -N 1  
-#SBATCH -t 24:00:00
-#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stdout/02a.ClipAridity.2019-04-03.sh.out
-#SBATCH -o /gpfs/loomis/scratch60/fas/caccone/nps25/stderr/02a.ClipAridity.2019-04-03.sh.err
-#SBATCH --output=02a.ClipAridity.2019-04-03.sh.log
-#SBATCH --job-name=02a.ClipAridity.2019-04-03.sh
-## sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh.log
 INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ARIDITY
 RASTERNAME=AI_annual
 
 CLIPNAME=UgandaKenyaClip
-OUTDIR=/project/caccone/nps25/project/RASTERS/${CLIPNAME}s
-gdal_translate  -projwin -4.8 42.5 4.73 28.6  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
-pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
-gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
 
 CLIPNAME=UgandaClip
-OUTDIR=/project/caccone/nps25/project/RASTERS/${CLIPNAME}s
-gdal_translate  -projwin -1.5 35.4 4.73 28.6  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
-pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
-gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 35.4 -1.5 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
 
 CLIPNAME=KenyaClip
-OUTDIR=/project/caccone/nps25/project/RASTERS/${CLIPNAME}s
-gdal_translate  -projwin -4.8 42.5 4.73 33.7  $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
-pksetmask -i ${RASTERNAME}_${CLIPNAME}.tif -m ${RASTERNAME}_${CLIPNAME}.tif -o ${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -9999   
-gdal_translate -of AAIGrid $OUTDIR/A${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 33.7 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
 EOF
 
-cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
 sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh
 
-#Submitted batch job 29254791
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02a.ClipAridity.2019-04-03.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/AI*.tif  #then "control z" and "bg" to leave in background
+openev /project/fas/caccone/nps25/RASTERS/UgandaClips/AI*.tif
+openev /project/fas/caccone/nps25/RASTERS/KenyaClips/AI*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/AI*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaClips/AI*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/KenyaClips/AI*.tif
+
+###############################################
+#Absolute humidity (ABSHUM) "ABS50_res": source of data https://github.com/evlynpless/MOSQLAND/blob/master/ABSHUM/sc01_get_ABSHUM.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 02b.ClipHumidity.2019-04-03.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=02b.ClipHumidity.2019-04-03.sh.log
+#SBATCH --job-name=02b.ClipHumidity.2019-04-03.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02b.ClipHumidity.2019-04-03.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02b.ClipHumidity.2019-04-03.sh.log
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ABSHUM
+RASTERNAME=ABS50_res
+
+CLIPNAME=UgandaKenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata 199 --operator ">" -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=UgandaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 35.4 -1.5 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata 199 --operator ">" -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=KenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 33.7 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata 199 --operator ">" -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02b.ClipHumidity.2019-04-03.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02b.ClipHumidity.2019-04-03.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/AB*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/AB*.tif
 
 
+###############################################
+#Elevation (MERIT) "altitude_1KMmedian_MERIT": source of data https://github.com/evlynpless/MOSQLAND/blob/master/MERIT/altitude/sc01_cp_altitude.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 02c.ClipElevation.2019-04-03.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=02c.ClipElevation.2019-04-03.sh.log
+#SBATCH --job-name=02c.ClipElevation.2019-04-03.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02c.ClipElevation.2019-04-03.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02c.ClipElevation.2019-04-03.sh.log
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/MERIT/altitude
+RASTERNAME=altitude_1KMmedian_MERIT
+
+CLIPNAME=UgandaKenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=UgandaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 35.4 -1.5 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=KenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 33.7 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02c.ClipElevation.2019-04-03.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02c.ClipElevation.2019-04-03.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/alt*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/alt*.tif
+
+###############################################
+#Slope (MERIT) "slope_1KMmedian_MERIT": source of data https://github.com/evlynpless/MOSQLAND/blob/master/MERIT/slope/sc01_cp_slope.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 02d.ClipSlope.2019-04-03.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=02d.ClipSlope.2019-04-03.sh.log
+#SBATCH --job-name=02d.ClipSlope.2019-04-03.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02d.ClipSlope.2019-04-03.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02d.ClipSlope.2019-04-03.sh.log
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/MERIT/slope
+RASTERNAME=slope_1KMmedian_MERIT
+
+CLIPNAME=UgandaKenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=UgandaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 35.4 -1.5 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=KenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 33.7 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02d.ClipSlope.2019-04-03.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02d.ClipSlope.2019-04-03.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/sl*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/sl*.tif
+
+###############################################
+#PET = potential evapo-transpiration "pet_mean": source of data https://github.com/evlynpless/MOSQLAND/blob/master/PET/sc01_cp_PET.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 02e.ClipPET.2019-04-03.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=02e.ClipPET.2019-04-03.sh.log
+#SBATCH --job-name=02e.ClipPET.2019-04-03.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02e.ClipPET.2019-04-03.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02e.ClipPET.2019-04-03.sh.log
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/PET
+RASTERNAME=pet_mean
+
+CLIPNAME=UgandaKenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -16257 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=UgandaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 35.4 -1.5 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -16257 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+
+CLIPNAME=KenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 33.7 4.73 42.5 -4.8 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -16257 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02e.ClipPET.2019-04-03.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02e.ClipPET.2019-04-03.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/pet*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/pet*.tif
 
 
+###############################################
+#CHELSA all 19 data types (for 2010?), download script https://github.com/evlynpless/MOSQLAND/blob/master/bioclim/sc01_wget_bioclim.sh
+#Bio1 = Annual Mean Temperature
+#Bio2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))
+#Bio3 = Isothermality (BIO2/BIO7) (* 100)
+#Bio4 = Temperature Seasonality (standard deviation *100)
+#Bio5 = Max Temperature of Warmest Month
+#Bio6 = Min Temperature of Coldest Month
+#Bio7 = Temperature Annual Range
+#Bio8 = Mean Temperature of Wettest Quarter
+#Bio9 = Mean Temperature of Driest Quarter
+#Bio10 = Mean Temperature of Warmest Quarter
+#Bio11 = Mean Temperature of Coldest Quarter
+#Bio12 = Annual Precipitation
+#Bio13 = Precipitation of Wettest Month
+#Bio14 = Precipitation of Driest Month
+#Bio15 = Precipitation Seasonality (Coefficient of Variation)
+#Bio16 = Precipitation of Wettest Quarter
+#Bio17 = Precipitation of Driest Quarter
+#Bio18 = Precipitation of Warmest Quarter
+#Bio19 = Precipitation of Coldest Quarter
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 02f.ClipCHELSA19.2019-04-03.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=02f.ClipCHELSA19.2019-04-03.sh.log
+#SBATCH --job-name=02f.ClipCHELSA19.2019-04-03.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02f.ClipCHELSA19.2019-04-03.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02f.ClipCHELSA19.2019-04-03.sh.log
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/bioclim
+RASTERNAME=CHELSA_bio10
 
+for n in $(seq 1 19 ); do
+CLIPNAME=UgandaKenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 42.5 -4.8 $INDIR/${RASTERNAME}_${n}.tif  $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif --msknodata -32768 -nodata -999  
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.asc
+
+CLIPNAME=UgandaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 28.6 4.73 35.4 -1.5 $INDIR/${RASTERNAME}_${n}.tif  $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif --msknodata -32768 -nodata -999   
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.asc
+
+CLIPNAME=KenyaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin 33.7 4.73 42.5 -4.8 $INDIR/${RASTERNAME}_${n}.tif  $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif --msknodata -32768 -nodata -999   
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${n}_${CLIPNAME}.asc
+done
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02f.ClipCHELSA19.2019-04-03.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/02f.ClipCHELSA19.2019-04-03.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/CHELSA_bio10_1_*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips/CHELSA_bio10_1_*.tif
+
+
+#OTHERS FOR FUTURE:
+friction = human transportation friction
+landcov = the 12 land cover types I mentioned
+texture = landscape 'texture' and heterogeneity
 
 
 ###############################################
@@ -332,6 +555,8 @@ cd /home/fas/caccone/nps25/scripts/GraceRep/
 git add --all
 git commit -m "Clipping scripts"
 git push -u origin master
+#username saarman
+#password Seadrag0n!
 
 </pre>
 </html>
