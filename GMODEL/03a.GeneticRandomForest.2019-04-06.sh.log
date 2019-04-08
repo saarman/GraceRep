@@ -1,0 +1,37 @@
+WARNING: unknown option '-no-readline'
+
+> 
+> #Based on Evie's code at https://github.com/evlynpless/MOSQLAND/blob/master/RF/sc06_iterativeRF_Florida.R
+> 
+> library("sp")
+> library("spatstat")
+Loading required package: spatstat.data
+Loading required package: nlme
+Loading required package: rpart
+
+spatstat 1.57-1       (nickname: ‘Cartoon Physics’) 
+For an introduction to spatstat, type ‘beginner’ 
+
+
+Note: R version 3.3.2 (2016-10-31) is more than 9 months old; we strongly recommend upgrading to the latest version
+> library("maptools")
+Checking rgeos availability: FALSE
+ 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
+ 	which has a restricted licence. It is disabled by default;
+ 	to enable gpclib, type gpclibPermit()
+> library("raster")
+
+Attaching package: ‘raster’
+
+The following objects are masked from ‘package:spatstat’:
+
+    area, rotate, shift
+
+The following object is masked from ‘package:nlme’:
+
+    getData
+
+> library("randomForest")
+Error in library("randomForest") : 
+  there is no package called ‘randomForest’
+Execution halted

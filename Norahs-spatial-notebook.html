@@ -45,7 +45,7 @@ get a set of spatial transects, and then get the mean under the transect for eac
 please be sure to follow the same steps of this presentation 
 https://research.computing.yale.edu/sites/default/files/files/Version%20Control%20with%20Git.pdf
 
-in the presentation they use bitbaket
+in the presentation they use bitbucket
 but you use git, any way it is the same concept.
 Before to push be sure that u run 
 
@@ -61,6 +61,7 @@ cd /home/nps25/scripts/GraceRep
 
 git config --global user.name "saarman"
 git config --global user.email "norah.saarman@yale.edu"
+#git init
 git remote add origin ssh:git@github.com:saarman/GraceRep.git
 git push -u origin master
 
@@ -236,12 +237,7 @@ plot(spatial.p)
 
 ###############################################
 #commit your most recent work:
-###############################################
-cd /home/fas/caccone/nps25/scripts/GraceRep/
-git add --all
-git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
-git push -u origin master
-
+####
 <HR>
 <A NAME="4"></A>2019-04-03</A>- Task: Clip layers to Uganda and Kenya</li>
 #NOTE: I copied Giuseppe's .bashrc file to my home directory so that the standard modules are loaded every time.
@@ -251,7 +247,13 @@ git push -u origin master
 srun --pty --x11 -p interactive bash
 cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 mkdir /project/fas/caccone/nps25/RASTERS/UgandaKenyaClips
-mkdir /project/fas/caccone/nps25/RASTERS/UgandaClips
+###########################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/
+git add --all
+git commit -m "01a CreateSpatialLines 2018-11-30 R scripts"
+git push -u origin master
+
+mkddir /project/fas/caccone/nps25/RASTERS/UgandaClips
 mkdir /project/fas/caccone/nps25/RASTERS/KenyaClips
 
 
@@ -563,6 +565,260 @@ git commit -m "Clipping scripts"
 git push -u origin master
 #username saarman
 #password Seadrag0n!
+
+<HR>
+<A NAME="5"></A>2019-04-06</A>- Task: try an iteration of the Random Forest Model</li>
+
+srun --pty -p interactive bash
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+
+
+cat << 'EOF' > 03a.GeneticRandomForest.2019-04-06.R
+
+#Based on Evie's code at https://github.com/evlynpless/MOSQLAND/blob/master/RF/sc06_iterativeRF_Florida.R
+
+library("sp")
+library("spatstat")
+library("maptools")
+library("raster")
+library("randomForest")
+library("gdistance")
+library("SDraw")
+library("tidyverse")
+
+crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
+
+###############################################
+#Plot lines as SpatialLines:
+###############################################
+
+#Plot straigt lines for first iteration of RF
+
+G.table <- read.table(file="/project/fas/caccone/nps25/GMODEL/dist_matrix.csv", sep=",", header=T) # ... load coordinates and Fst, etc from file
+
+begin.table <- G.table[,c(5,3)]
+begin.coord <- begin.table
+coordinates(begin.coord) <- c("long1", "lat1")
+
+end.table <- G.table[,c(6,4)]
+end.coord <- end.table
+coordinates(end.coord) <- c("long2", "lat2")
+
+p <- psp(begin.table[,1], begin.table[,2], end.table[,1], end.table[,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
+
+spatial.p <- as(p, "SpatialLines")
+proj4string(spatial.p) <- crs.geo  # define projection system of our data
+
+print("spatial lines done")
+
+###############################################
+#Create raster stack 
+###############################################
+
+raster01I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/pet_mean_UgandaClip.tif")
+raster02I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/slope_1KMmedian_MERIT_UgandaClip.tif")
+raster03I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/AI_annual_UgandaClip.tif")
+raster04I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/altitude_1KMmedian_MERIT_UgandaClip.tif")
+raster05I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_10_UgandaClip.tif")
+raster06I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_11_UgandaClip.tif")
+raster07I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_12_UgandaClip.tif")
+raster08I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_13_UgandaClip.tif")
+raster09I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_14_UgandaClip.tif")
+raster10I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_15_UgandaClip.tif")
+raster11I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_16_UgandaClip.tif")
+raster12I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_17_UgandaClip.tif")
+raster13I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_18_UgandaClip.tif")
+raster14I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_19_UgandaClip.tif")
+raster15I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_1_UgandaClip.tif")
+raster16I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_2_UgandaClip.tif")
+raster17I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_3_UgandaClip.tif")
+raster18I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_4_UgandaClip.tif")
+raster19I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_5_UgandaClip.tif")
+raster20I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_6_UgandaClip.tif")
+raster21I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_7_UgandaClip.tif")
+raster22I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_8_UgandaClip.tif")
+raster23I = raster("/project/fas/caccone/nps25/RASTERS/UgandaClips/CHELSA_bio10_9_UgandaClip.tif")
+
+raster01 <- raster01I*1
+raster02 <- raster02I*1
+raster03 <- raster03I*1
+raster04 <- raster04I*1
+raster05 <- raster05I*1
+raster06 <- raster06I*1
+raster07 <- raster07I*1
+raster08 <- raster08I*1
+raster09 <- raster09I*1
+raster10 <- raster10I*1
+raster11 <- raster11I*1
+raster12 <- raster12I*1
+raster13 <- raster13I*1
+raster14 <- raster14I*1
+raster15 <- raster15I*1
+raster16 <- raster16I*1
+raster17 <- raster17I*1
+raster18 <- raster18I*1
+raster19 <- raster19I*1
+raster20 <- raster20I*1
+raster21 <- raster21I*1
+raster22 <- raster22I*1
+raster23 <- raster23I*1
+
+proj4string(raster01) <- crs.geo
+proj4string(raster02) <- crs.geo
+proj4string(raster03) <- crs.geo
+proj4string(raster04) <- crs.geo
+proj4string(raster05) <- crs.geo
+proj4string(raster06) <- crs.geo
+proj4string(raster07) <- crs.geo
+proj4string(raster08) <- crs.geo
+proj4string(raster09) <- crs.geo
+proj4string(raster10) <- crs.geo
+proj4string(raster11) <- crs.geo
+proj4string(raster12) <- crs.geo
+proj4string(raster13) <- crs.geo
+proj4string(raster14) <- crs.geo
+proj4string(raster15) <- crs.geo
+proj4string(raster16) <- crs.geo
+proj4string(raster17) <- crs.geo
+proj4string(raster18) <- crs.geo
+proj4string(raster19) <- crs.geo
+proj4string(raster20) <- crs.geo
+proj4string(raster21) <- crs.geo
+proj4string(raster22) <- crs.geo
+proj4string(raster23) <- crs.geo
+
+env=stack(raster01,
+          raster02,
+          raster03,
+          raster04,
+          raster05,
+          raster06,
+          raster07,
+          raster08,
+          raster09,
+          raster10,
+          raster11,
+          raster12,
+          raster13,
+          raster14,
+          raster15,
+          raster16,
+          raster17,
+          raster18,
+          raster19,
+          raster20,
+          raster21,
+          raster22,
+          raster23)
+
+names(env) [1]  <- "pet_mean"
+names(env) [2]  <- "slope"
+names(env) [3]  <- "AI_annual"
+names(env) [4]  <- "altitude"
+names(env) [5]  <- "CHELSA_bio10_10"
+names(env) [6]  <- "CHELSA_bio10_11"
+names(env) [7]  <- "CHELSA_bio10_12"
+names(env) [8]  <- "CHELSA_bio10_13"
+names(env) [9]  <- "CHELSA_bio10_14"
+names(env) [10] <- "CHELSA_bio10_15"
+names(env) [11] <- "CHELSA_bio10_16"
+names(env) [12] <- "CHELSA_bio10_17"
+names(env) [13] <- "CHELSA_bio10_18"
+names(env) [14] <- "CHELSA_bio10_19"
+names(env) [15] <- "CHELSA_bio10_1"
+names(env) [16] <- "CHELSA_bio10_2"
+names(env) [17] <- "CHELSA_bio10_3"
+names(env) [18] <- "CHELSA_bio10_4"
+names(env) [19] <- "CHELSA_bio10_5"
+names(env) [20] <- "CHELSA_bio10_6"
+names(env) [21] <- "CHELSA_bio10_7"
+names(env) [22] <- "CHELSA_bio10_8"
+names(env) [23] <- "CHELSA_bio10_9"
+
+print("raster stack done")
+
+########################################
+#Calculate mean of straight lines and making initial RF model
+#######################################
+StraightMean <- raster::extract(env, spatial.p, fun=mean, na.rm=TRUE)
+
+StraightMeanDF <- as.data.frame(StraightMean)
+
+StraightMeanDF$FST_arl <- G.table$FST_arl
+
+#option of trying DPS
+#StraightMeanDF$DPS <- G.table$DPS
+
+Straight_RF1 = randomForest(FST_arl ~ pet_mean +
+                                      slope +
+                                      AI_annual +
+                                      altitude +
+                                      CHELSA_bio10_10 +
+                                      CHELSA_bio10_11 +
+                                      CHELSA_bio10_12 +
+                                      CHELSA_bio10_13 +
+                                      CHELSA_bio10_14 +
+                                      CHELSA_bio10_15 +
+                                      CHELSA_bio10_16 +
+                                      CHELSA_bio10_17 +
+                                      CHELSA_bio10_18 +
+                                      CHELSA_bio10_19 +
+                                      CHELSA_bio10_1 +
+                                      CHELSA_bio10_2 +
+                                      CHELSA_bio10_3 +
+                                      CHELSA_bio10_4 +
+                                      CHELSA_bio10_5 +
+                                      CHELSA_bio10_6 +
+                                      CHELSA_bio10_7 +
+                                      CHELSA_bio10_8 +
+                                      CHELSA_bio10_9, importance=TRUE, na.action=na.omit, data=StraightMeanDF)
+
+Straight_RF
+
+StraightPred <- predict(env, Straight_RF)
+
+print("first prediction resistance surface done")
+
+pred.cond <- 1/StraightPred #build conductance surface
+
+save.image(file = "/project/fas/caccone/nps25/GMODEL/03a.GeneticRandomForest.2019-04-06.RData")
+
+test = summary(LCP_RF)
+EOF
+
+
+#RUN in sbatch mode:
+cat << 'EOF' > 03a.GeneticRandomForest.2019-04-06.sh
+#!/bin/bash
+#SBATCH -p day 
+#SBATCH -n 1 -c 1  -N 1  
+#SBATCH -t 24:00:00
+#SBATCH --output=03a.GeneticRandomForest.2019-04-06.sh.log
+#SBATCH --job-name=03a.GeneticRandomForest.2019-04-06.sh
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/03a.GeneticRandomForest.2019-04-06.sh
+##LOGFILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/03a.GeneticRandomForest.2019-04-06.sh.log
+
+module load Apps/R/3.3.2-generic
+module load Rpkgs/RGDAL/1.2-5
+R --vanilla -no-readline -q  -f  /home/fas/caccone/nps25/scripts/GraceRep/GMODEL/03a.GeneticRandomForest.2019-04-06.R
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/03a.GeneticRandomForest.2019-04-06.sh
+#Submitted batch job 29336561
+
+#didn't work for some reason... try again.
+
+
+
+
+
+
+
+
+
+
+
+
 
 </pre>
 </html>
