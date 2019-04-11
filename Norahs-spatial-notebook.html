@@ -806,14 +806,658 @@ EOF
 sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/03a.GeneticRandomForest.2019-04-06.sh
 #Submitted batch job 29336561
 
-#didn't work for some reason... try again.
+#didn't work for some reason... trying on laptop first.
+
+<HR>
+<A NAME="6"></A>2019-04-11</A>- Task: R code for Random Forest Model on local computer, needs to be modified for Grace at some later date...</li>
+
+cat << 'EOF' > 03a.GeneticRandomForest.2019-04-06.R
+#Based on Evie's code at https://github.com/evlynpless/MOSQLAND/blob/master/RF/sc06_iterativeRF_Florida.R
+
+library(classInt)
+library(raster)
+library(rgdal)
+library(dismo)
+library(XML)
+library(maps)
+library(sp)
+library(classInt)
+
+library("sp")
+library("spatstat")
+library("maptools")
+library("raster")
+library("randomForest")
+library("gdistance")
+library("SDraw")
+library("tidyverse")
+
+setwd("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model")
+
+crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
+
+###############################################
+#Plot lines as SpatialLines:
+###############################################
+
+#Plot straigt lines for first iteration of RF
+
+G.table <- read.table(file="dist_matrix.csv", sep=",", header=T) # ... load coordinates and Fst, etc from file
+
+begin.table <- G.table[,c(5,3)]
+begin.coord <- begin.table
+begin.Sp.points <- SpatialPoints(begin.coord)
+
+end.table <- G.table[,c(6,4)]
+end.coord <- end.table
+end.Sp.points <- SpatialPoints(end.coord)
+
+p <- psp(begin.table[,1], begin.table[,2], end.table[,1], end.table[,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
+
+plot(p)
+
+spatial.p <- as(p, "SpatialLines")
+proj4string(spatial.p) <- crs.geo  # define projection system of our data
+
+print("spatial lines done")
+
+###############################################
+#Calculate geodist for each line
+###############################################
+
+geodist <- pointDistance(begin.Sp.points, end.Sp.points, lonlat=TRUE, allpairs=FALSE)
+summary(geodist)
+head(geodist)
+
+###############################################
+#Create raster stack 
+###############################################
+#The "I" times 1 puts the raster in active memory
+
+raster01I = raster("./UgandaClips/pet_mean_UgandaClip.tif")
+raster02I = raster("./UgandaClips/slope_1KMmedian_MERIT_UgandaClip.tif")
+raster03I = raster("./UgandaClips/AI_annual_UgandaClip.tif")
+raster04I = raster("./UgandaClips/altitude_1KMmedian_MERIT_UgandaClip.tif")
+raster05I = raster("./UgandaClips/CHELSA_bio10_10_UgandaClip.tif")
+raster06I = raster("./UgandaClips/CHELSA_bio10_11_UgandaClip.tif")
+raster07I = raster("./UgandaClips/CHELSA_bio10_12_UgandaClip.tif")
+raster08I = raster("./UgandaClips/CHELSA_bio10_13_UgandaClip.tif")
+raster09I = raster("./UgandaClips/CHELSA_bio10_14_UgandaClip.tif")
+raster10I = raster("./UgandaClips/CHELSA_bio10_15_UgandaClip.tif")
+raster11I = raster("./UgandaClips/CHELSA_bio10_16_UgandaClip.tif")
+raster12I = raster("./UgandaClips/CHELSA_bio10_17_UgandaClip.tif")
+raster13I = raster("./UgandaClips/CHELSA_bio10_18_UgandaClip.tif")
+raster14I = raster("./UgandaClips/CHELSA_bio10_19_UgandaClip.tif")
+raster15I = raster("./UgandaClips/CHELSA_bio10_1_UgandaClip.tif")
+raster16I = raster("./UgandaClips/CHELSA_bio10_2_UgandaClip.tif")
+raster17I = raster("./UgandaClips/CHELSA_bio10_3_UgandaClip.tif")
+raster18I = raster("./UgandaClips/CHELSA_bio10_4_UgandaClip.tif")
+raster19I = raster("./UgandaClips/CHELSA_bio10_5_UgandaClip.tif")
+raster20I = raster("./UgandaClips/CHELSA_bio10_6_UgandaClip.tif")
+raster21I = raster("./UgandaClips/CHELSA_bio10_7_UgandaClip.tif")
+raster22I = raster("./UgandaClips/CHELSA_bio10_8_UgandaClip.tif")
+raster23I = raster("./UgandaClips/CHELSA_bio10_9_UgandaClip.tif")
+
+raster01 <- raster01I*1
+raster02 <- raster02I*1
+raster03 <- raster03I*1
+raster04 <- raster04I*1
+raster05 <- raster05I*1
+raster06 <- raster06I*1
+raster07 <- raster07I*1
+raster08 <- raster08I*1
+raster09 <- raster09I*1
+raster10 <- raster10I*1
+raster11 <- raster11I*1
+raster12 <- raster12I*1
+raster13 <- raster13I*1
+raster14 <- raster14I*1
+raster15 <- raster15I*1
+raster16 <- raster16I*1
+raster17 <- raster17I*1
+raster18 <- raster18I*1
+raster19 <- raster19I*1
+raster20 <- raster20I*1
+raster21 <- raster21I*1
+raster22 <- raster22I*1
+raster23 <- raster23I*1
+
+proj4string(raster01) <- crs.geo
+proj4string(raster02) <- crs.geo
+proj4string(raster03) <- crs.geo
+proj4string(raster04) <- crs.geo
+proj4string(raster05) <- crs.geo
+proj4string(raster06) <- crs.geo
+proj4string(raster07) <- crs.geo
+proj4string(raster08) <- crs.geo
+proj4string(raster09) <- crs.geo
+proj4string(raster10) <- crs.geo
+proj4string(raster11) <- crs.geo
+proj4string(raster12) <- crs.geo
+proj4string(raster13) <- crs.geo
+proj4string(raster14) <- crs.geo
+proj4string(raster15) <- crs.geo
+proj4string(raster16) <- crs.geo
+proj4string(raster17) <- crs.geo
+proj4string(raster18) <- crs.geo
+proj4string(raster19) <- crs.geo
+proj4string(raster20) <- crs.geo
+proj4string(raster21) <- crs.geo
+proj4string(raster22) <- crs.geo
+proj4string(raster23) <- crs.geo
+
+env=stack(raster01,
+          raster02,
+          raster03,
+          raster04,
+          raster05,
+          raster06,
+          raster07,
+          raster08,
+          raster09,
+          raster10,
+          raster11,
+          raster12,
+          raster13,
+          raster14,
+          raster15,
+          raster16,
+          raster17,
+          raster18,
+          raster19,
+          raster20,
+          raster21,
+          raster22,
+          raster23)
+
+names(env) [1]  <- "pet_mean"
+names(env) [2]  <- "slope"
+names(env) [3]  <- "aridity_annual"
+names(env) [4]  <- "altitude"
+names(env) [5]  <- "Bio10_temp_mean_warmestQ"
+names(env) [6]  <- "Bio11_temp_mean_coldestQ"
+names(env) [7]  <- "Bio12_precip_annual"
+names(env) [8]  <- "Bio13_precip_wettestMo"
+names(env) [9]  <- "Bio14_precip_driestMo"
+names(env) [10] <- "Bio15_precip_seasonality"
+names(env) [11] <- "Bio16_precip_wettestQ"
+names(env) [12] <- "Bio17_precip_driestQ"
+names(env) [13] <- "Bio18_precip_warmestQ"
+names(env) [14] <- "Bio19_precip_coldestQ"
+names(env) [15] <- "Bio01_temp_mean_annual"
+names(env) [16] <- "Bio02_temp_mean_diurnal_range"
+names(env) [17] <- "Bio03_isothermality"
+names(env) [18] <- "Bio04_temp_seasonality"
+names(env) [19] <- "Bio05_temp_max_warmestMo"
+names(env) [20] <- "Bio06_temp_min_coldestMo"
+names(env) [21] <- "Bio07_temp_annual_range"
+names(env) [22] <- "Bio08_temp_mean_wettestQ"
+names(env) [23] <- "Bio09_temp_mean_driestQ"
+
+print("raster stack done")
+
+########################################
+#Calculate mean of straight lines 
+#######################################
+StraightMean <- raster::extract(env, spatial.p, fun=mean, na.rm=TRUE)
+
+summary(StraightMean)
+
+StraightMeanDF <- as.data.frame(StraightMean) #DF=data frame
+
+StraightMeanDF$genetdist <- G.table$genetdist #Adds FST into the data frame
+
+head(StraightMeanDF)
+
+#option of trying DPS (another measure of genetic distance)
+#StraightMeanDF$DPS <- G.table$DPS
+
+########################################
+#making initial RF model based on mean of straight lines
+#######################################
+
+#with geodist:
+Straight_RF1 = randomForest(genetdist ~ geodist +
+                              pet_mean +
+                              slope +
+                              aridity_annual +
+                              altitude +
+                              Bio10_temp_mean_warmestQ +
+                              Bio11_temp_mean_coldestQ +
+                              Bio12_precip_annual +
+                              Bio13_precip_wettestMo +
+                              Bio14_precip_driestMo +
+                              Bio15_precip_seasonality +
+                              Bio16_precip_wettestQ +
+                              Bio17_precip_driestQ +
+                              Bio18_precip_warmestQ +
+                              Bio19_precip_coldestQ +
+                              Bio01_temp_mean_annual +
+                              Bio02_temp_mean_diurnal_range +
+                              Bio03_isothermality +
+                              Bio04_temp_seasonality +
+                              Bio05_temp_max_warmestMo +
+                              Bio06_temp_min_coldestMo +
+                              Bio07_temp_annual_range +
+                              Bio08_temp_mean_wettestQ +
+                              Bio09_temp_mean_driestQ, importance=TRUE, na.action=na.omit, data=StraightMeanDF)
+
+Straight_RF1 #gives you the % variance explained
+varImpPlot(Straight_RF1) #gives a plot of which variables are most important
+
+#StraightPred1 <- predict(env, Straight_RF1) #doesn't work because the model has an extra variable, geodist that the raster, env, does not
+
+#plot(StraightPred1)
+
+#pred.cond1 <- 1/StraightPred1 #build conductance surface
+
+#plot(pred.cond1)
+
+
+#without geodist:
+Straight_RF = randomForest(genetdist ~ pet_mean +
+                             slope +
+                             aridity_annual +
+                             altitude +
+                             Bio10_temp_mean_warmestQ +
+                             Bio11_temp_mean_coldestQ +
+                             Bio12_precip_annual +
+                             Bio13_precip_wettestMo +
+                             Bio14_precip_driestMo +
+                             Bio15_precip_seasonality +
+                             Bio16_precip_wettestQ +
+                             Bio17_precip_driestQ +
+                             Bio18_precip_warmestQ +
+                             Bio19_precip_coldestQ +
+                             Bio01_temp_mean_annual +
+                             Bio02_temp_mean_diurnal_range +
+                             Bio03_isothermality +
+                             Bio04_temp_seasonality +
+                             Bio05_temp_max_warmestMo +
+                             Bio06_temp_min_coldestMo +
+                             Bio07_temp_annual_range +
+                             Bio08_temp_mean_wettestQ +
+                             Bio09_temp_mean_driestQ, importance=TRUE, na.action=na.omit, data=StraightMeanDF)
+
+Straight_RF #gives you the % variance explained
+varImpPlot(Straight_RF) #gives a plot of which variables are most important
+
+StraightPred <- predict(env, Straight_RF) 
+plot(StraightPred,frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+
+pred.cond <- 1/StraightPred #build conductance surface
+plot(pred.cond,frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+
+# to save a raster file, for example:
+writeRaster(pred.cond, "RF_ConnectivitySurface.asc", format = "ascii")
+
+#Save both results of variable imnportance with and without geodist:
+dev.off()
+pdf(file="VariableImportance.pdf",height=6,width=10)
+par(mfrow=c(1,2))
+varImpPlot(Straight_RF, main="Random Forest variance importance (without geo. dist.)")
+varImpPlot(Straight_RF1, main="Random Forest variance importance (with geo. dist.)")
+dev.off()
+
+print("first prediction resistance surface done")
+
+save.image(file = "03a.GeneticRandomForest.2019-04-06.RData")
+
+
+###############################################
+#MAP some of the rasters in black & white
+###############################################
+load("~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/03a.GeneticRandomForest.2019-04-06.RData")
+load("~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/04b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
+
+colfunc1 <- colorRampPalette(c("white", "light grey", "black"))
+colfunc2 <- colorRampPalette(c("white","black"))
+colfunc3 <- colorRampPalette(c("white", "dark grey", "black"))
+
+
+pdf(file="1st_Bio09_temp_mean_driestQ.pdf")
+plot(env$Bio09_temp_mean_driestQ,main="Bio09_temp_mean_driestQ",col=colfunc1(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="2nd_Bio08_temp_mean_wettestQ.pdf")
+plot(env$Bio08_temp_mean_wettestQ,main="Bio08_temp_mean_wettestQ",col=colfunc1(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="3rd_Bio03_isothermality.pdf")
+plot(env$Bio03_isothermality,main="Bio03_isothermality",col=colfunc2(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="4th_Bio12_precip_annual.pdf")
+plot(env$Bio12_precip_annual,main="Bio12_precip_annual",col=colfunc2(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="5th_Bio19_precip_coldestQ.pdf")
+plot(env$Bio19_precip_coldestQ,main="Bio19_precip_coldestQ",col=colfunc2(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="7th_altitude.pdf")
+plot(env$altitude,main="altitude",col=colfunc2(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+
+#add points
+pdf(file="StraightLines.pdf")
+plot(env$altitude,main="pairwise distance lines",col=colfunc2(25),frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+plot(p,add=T,col="blue")
+dev.off()
+
+EOF
 
 
 
+<HR>
+<A NAME="7"></A>2019-04-11</A>- Task: R code for bivariate map on local computer, needs to be modified for Grace at some later date...</li>
+
+cat << 'EOF' > 04b.GeneticRandomForest_Habitat_bivariate.R
+
+##################################################################################
+#Make bivariate.map
+##################################################################################
+
+library(classInt)
+library(raster)
+library(rgdal)
+library(dismo)
+library(XML)
+library(maps)
+library(sp)
+library(classInt)
+
+library("sp")
+library("spatstat")
+library("maptools")
+library("raster")
+library("randomForest")
+library("gdistance")
+library("SDraw")
+library("tidyverse")
+
+crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
+
+##################################################################################
+#Go back to look at Random Forest results:
+##################################################################################
+setwd("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model")
+load("~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/03a.GeneticRandomForest.2019-04-06.RData")
+library("randomForest")
+
+#The prediction, of resistance, and of connectivity:
+plot(StraightPred)
+StraightPredConnect <- 1/StraightPred #build conductance surface
+plot(StraightPredConnect)
 
 
+####################################################
+#import files, include FAO and maxHS raster file
+####################################################
+
+PRED <- raster("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/RF_ConnectivitySurfaceScaled.asc")
+proj4string(PRED) <- crs.geo 
+plot(PRED)
+
+FAO <- raster("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-Mary/R-tools-patches/fuscipesf/fuscipesf/dblbnd.adf") #FAO map
+proj4string(FAO) <- crs.geo 
+plot(FAO)
+
+maryHS <- raster("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-Mary/R-tools-patches/HS-maps/PSN_raw/Glossina_fuscipes_fuscipes.asc") 
+proj4string(maryHS) <- crs.geo 
+plot(maryHS)
+
+meanHS <- raster("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-Mary/R-tools-patches/HS-maps/PSN_FAO_average/psnfao_mean/dblbnd.adf")
+proj4string(meanHS) <- crs.geo 
+plot(meanHS)
+
+maxHS <- raster("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-Mary/R-tools-patches/HS-maps/PSN_FAO_max/psnfao_max/dblbnd.adf")  #max of FAO and updated habitat suitability model
+proj4string(maxHS) <- crs.geo 
+plot(maxHS)
+
+blendHS <- raster("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-Mary/R-tools-patches/HS-maps/PSN_FAO_blend/psnfao_blend/dblbnd.adf") #max of FAO and updated habitat suitability
+proj4string(blendHS) <- crs.geo 
+plot(blendHS)
+
+waterFull <- shapefile("/Users/nsaarman1/Dropbox/Caccone_Aksoy/QGIS/from\ www.diva-gis.org/waterbodies_africa/waterbodies_africa.dbf") 
+spWater <- spTransform(waterFull,crs.geo)
+waterFull <- spWater
+plot(waterFull, col="black", legend=FALSE)
+
+Uganda <- shapefile("/Users/nsaarman1/Dropbox/Caccone_Aksoy/Glossina-Mary/R-tools-patches/UGA_adm/UGA_adm0.dbf")
+spUganda <- spTransform(Uganda,crs.geo)
+Uganda <- spUganda
+plot(Uganda)
+
+####################################################
+# Compare different maps:
+####################################################
+dev.off()
+plot(FAO,main="FAO habitat suitability map from 2001",frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(spWater,add=T,col="black",legend=F)
+
+plot(blendHS,main="Updated FAO habitat suitability map from 2018",frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(spWater,add=T,col="black",legend=F)
+
+plot(PRED,main="Random Forest Predicted Connectivity",frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(spWater,add=T,col="black",legend=F)
+
+####################################
+#crop each HS to Uganda
+####################################
+FAOcrop <- crop(FAO,Uganda)
+#rescale to 0 to 1
+r <- FAOcrop
+r.min = cellStats(r, "min")
+r.max = cellStats(r, "max")
+r.scale <- ((r - r.min) / (r.max - r.min))
+FAOcrop <- r.scale
+
+######################
+blendHScrop <- crop(blendHS,Uganda)
+#rescale to 0 to 1
+r <- blendHScrop
+r.min = cellStats(r, "min")
+r.max = cellStats(r, "max")
+r.scale <- ((r - r.min) / (r.max - r.min))
+blendHScrop <- r.scale
+
+######################
+maxHScrop <- crop(maxHS,Uganda)
+#rescale to 0 to 1
+r <- maxHScrop
+r.min = cellStats(r, "min")
+r.max = cellStats(r, "max")
+r.scale <- ((r - r.min) / (r.max - r.min))
+maxHScrop <- r.scale
+
+######################
+meanHScrop <- crop(meanHS,Uganda)
+#rescale to 0 to 1
+r <- meanHScrop
+r.min = cellStats(r, "min")
+r.max = cellStats(r, "max")
+r.scale <- ((r - r.min) / (r.max - r.min))
+meanHScrop <- r.scale
+
+######################
+PREDcrop <- crop(PRED,Uganda)
+#rescale to 0 to 1
+r <- PREDcrop
+r.min = cellStats(r, "min")
+r.max = cellStats(r, "max")
+r.scale <- ((r - r.min) / (r.max - r.min))
+PREDcrop <- r.scale
+##########
 
 
+#############################################
+# Compare different maps after cropping
+dev.off()
+plot(FAOcrop,main="FAO habitat suitability map from 2001",frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+
+plot(blendHScrop,main="FAO habitat suitability map updated 2018",frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+
+plot(PREDcrop,main="Random Forest Predicted Connectivity",frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+
+#############################################
+#create a color matrix for Bivariate map:
+#############################################
+colmat<-function(nquantiles=10, upperleft=rgb(0,150,235, maxColorValue=255), upperright=rgb(130,0,80, maxColorValue=255), bottomleft="grey", bottomright=rgb(255,230,15, maxColorValue=255), xlab="x label", ylab="y label"){
+  my.data<-seq(0,1,.01)
+  my.class<-classIntervals(my.data,n=nquantiles,style="quantile")
+  my.pal.1<-findColours(my.class,c(upperleft,bottomleft))
+  my.pal.2<-findColours(my.class,c(upperright, bottomright))
+  col.matrix<-matrix(nrow = 101, ncol = 101, NA)
+  for(i in 1:101){
+    my.col<-c(paste(my.pal.1[i]),paste(my.pal.2[i]))
+    col.matrix[102-i,]<-findColours(my.class,my.col)}
+  plot(c(1,1),pch=19,col=my.pal.1, cex=0.5,xlim=c(0,1),ylim=c(0,1),frame.plot=F, xlab=xlab, ylab=ylab,cex.lab=1.3)
+  for(i in 1:101){
+    col.temp<-col.matrix[i-1,]
+    points(my.data,rep((i-1)/100,101),pch=15,col=col.temp, cex=1)}
+  seqs<-seq(0,100,(100/nquantiles))
+  seqs[1]<-1
+  col.matrix<-col.matrix[c(seqs), c(seqs)]}
+
+col.matrix<-colmat(nquantiles=9, xlab="genetic connectivity", ylab="habitat suitability")
+
+#############################################
+#Build bivariate map function:
+#############################################
+bivariate.map<-function(rasterx, rastery, colormatrix=col.matrix, nquantiles=10){
+  quanmean<-getValues(rasterx)
+  temp<-data.frame(quanmean, quantile=rep(NA, length(quanmean)))
+  brks<-with(temp, quantile(temp,na.rm=T, probs = c(seq(0,1,1/nquantiles))))
+  r1<-within(temp, quantile <- cut(quanmean, breaks = brks, labels = 2:length(brks),include.lowest = TRUE))
+  quantr<-data.frame(r1[,2]) 
+  quanvar<-getValues(rastery)
+  temp<-data.frame(quanvar, quantile=rep(NA, length(quanvar)))
+  brks<-with(temp, quantile(temp,na.rm=TRUE, probs = c(seq(0,1,1/nquantiles))))
+  r2<-within(temp, quantile <- cut(quanvar, breaks = brks, labels = 2:length(brks),include.lowest = TRUE))
+  quantr2<-data.frame(r2[,2])
+  as.numeric.factor<-function(x) {as.numeric(levels(x))[x]}
+  col.matrix2<-colormatrix
+  cn<-unique(colormatrix)
+  for(i in 1:length(col.matrix2)){
+    ifelse(is.na(col.matrix2[i]),col.matrix2[i]<-1,col.matrix2[i]<-which(col.matrix2[i]==cn)[1])}
+  cols<-numeric(length(quantr[,1]))
+  for(i in 1:length(quantr[,1])){
+    a<-as.numeric.factor(quantr[i,1])
+    b<-as.numeric.factor(quantr2[i,1])
+    cols[i]<-as.numeric(col.matrix2[b,a])}
+  r<-rasterx
+  r[1:length(r)]<-cols
+  return(r)}
+
+#############################################
+# Use the bivariate.map function:
+#############################################
+
+bivmap<-bivariate.map(PREDcrop,blendHScrop,colormatrix=col.matrix, nquantiles=9)
+# Note: go back to the function that generates color matrices and try out new color schemes.
+
+# Plot the bivariate map:
+plot(bivmap,frame.plot=F,axes=F,box=F,add=F,legend=F,col=as.vector(col.matrix))
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black")
+
+#bivariate legend
+col.matrix<-colmat(nquantiles=9, xlab="Random Forest Genetic Connectivity", ylab="MaxENT Habitat Suitability")
+
+
+#############################################
+#Load data from above:
+#############################################
+load("~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/04b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
+
+#############################################
+#plot all three maps with complementary colors:
+#############################################
+colfuncX <- colorRampPalette(c("white", "#EFCA17", "red"))
+#colfuncX <- colorRampPalette(c("#FFE50E","#821250"))
+colfuncY <- colorRampPalette(c("white","#0096EC","#701363"))
+#colfuncY <- colorRampPalette(c("#75AFCE","#612576"))
+
+plot(PREDcrop,main="Random Forest Genetic Connectivity", col=colfuncX(25),frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+
+plot(blendHScrop, main="MaxENT Habitat Suitability", col=colfuncY(25),frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+
+plot(bivmap,main="Genetic Connectivity vs Habitat Suitability", col=as.vector(col.matrix), frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+
+col.matrix<-colmat(nquantiles=9, xlab="Random Forest Genetic Connectivity", ylab="MaxENT Habitat Suitability")
+
+#############################################
+#print to PDFs:
+#############################################
+pdf(file="Random Forest Genetic Connectivity.pdf")
+plot(PREDcrop,main="Random Forest Genetic Connectivity", col=colfuncX(25),frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="MaxENT Habitat Suitability.pdf")
+plot(blendHScrop, main="MaxENT Habitat Suitability", col=colfuncY(25),frame.plot=F,axes=F,box=F,add=F,legend=T)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="Genetic Connectivity vs Habitat Suitability.pdf")
+plot(bivmap,main="Genetic Connectivity vs Habitat Suitability", col=as.vector(col.matrix), frame.plot=F,axes=F,box=F,add=F,legend=F)
+map(interior=T,add=T)
+plot(waterFull,add=T,col="black",legend=F)
+dev.off()
+
+pdf(file="Bivariate legend.pdf")
+col.matrix<-colmat(nquantiles=9, xlab="Random Forest Genetic Connectivity", ylab="MaxENT Habitat Suitability")
+dev.off()
+
+save.image(file = "04b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
+
+EOF
+
+
+###############################################
+#commit your most recent work:
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/
+git add --all
+git commit -m "Clipping scripts"
+git push -u origin master
+#username saarman
+#password Seadrag0n!
 
 
 
