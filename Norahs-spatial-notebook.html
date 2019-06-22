@@ -1780,7 +1780,7 @@ git push -u origin master
 #password Seadrag0n!
 
 <HR>
-<A NAME="10"></A>2019-06-18</A>- Task: Random forest with iterative strategy</li>
+<A NAME="10"></A>2019-06-18</A>- Task: Random forest with validation step</li>
 
 #Download to desktop for now:
 cd ~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/Uganda08-13/
@@ -1801,7 +1801,7 @@ mget/home/fas/caccone/apb56/project/CHELSA/biovars/UgandaBiovarsSeasonalFuture.t
 #MAKE R script:
 cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
 
-cat << 'EOF' > 07a.GeneticRandomForestIterative.2019-06-18.R
+cat << 'EOF' > 07a.GeneticRandomForest.2019-06-22.R
 #Based on Evie's code at https://github.com/evlynpless/MOSQLAND/blob/master/RF/sc06_iterativeRF_Florida.R
 
 library("classInt")
@@ -1852,12 +1852,15 @@ proj4string(spatial.p) <- crs.geo  # define projection system of our data
 print("spatial lines done")
 
 ###############################################
-#Calculate geodist for each line
+#Calculate geodist for each line and add it to the G.table
 ###############################################
 
 geodist <- pointDistance(begin.Sp.points, end.Sp.points, lonlat=TRUE, allpairs=FALSE)
 summary(geodist)
 head(geodist)
+
+G.table <- cbind(G.table,geodist)
+
 
 ###############################################
 #Create raster stack 
@@ -2199,7 +2202,7 @@ summary(StraightMean)
 StraightMeanDF <- as.data.frame(StraightMean) #DF=data frame
 
 StraightMeanDF$genetdist <- G.table$genetdist #Adds FST into the data frame
-
+StraightMeanDF$geodist <- G.table$geodist #Adds geographic distance into the data frame
 head(StraightMeanDF)
 
 #option of trying DPS (another measure of genetic distance)
@@ -2409,7 +2412,7 @@ plot(boundariesUg,add=T)
 ###########################
 #save project:
 ###########################
-save.image(file = "07a.GeneticRandomForestIterative.2019-06-18.RData")
+save.image(file = "07a.GeneticRandomForest.2019-06-22.RData")
 
 
 ###########################
@@ -2518,8 +2521,7 @@ plot(p,add=T,col="blue")
 ###########################
 #save project:
 ###########################
-save.image(file = "07a.GeneticRandomForestIterative.2019-06-18.RData")
-
+save.image(file = "07a.GeneticRandomForest.2019-06-22.RData")
 
 
 ###########################
@@ -2584,30 +2586,165 @@ cor2 = cor(predict(Straight_RF2, StraightMeanDF.valid), StraightMeanDF.valid$gen
 write.table(cor1, "InternalValidation.txt")
 write.table(cor2, "ExternalValidation.txt")
 
-pdf("Straight_scatter1.pdf", 5, 5)
-plot(StraightMeanDF.train$genetdist, Straight_RF2$predicted)
+
+
+#Plot observed vs predicted
+Tdata <- StraightMeanDF.train$genetdist
+Vdata <- StraightMeanDF.valid$genetdist
+Idata <- StraightMeanDF$genetdist
+PredictedIdata <- Straight_RF$predicted
+PredictedTdata <-raster::predict(Straight_RF2, StraightMeanDF.train)
+PredictedVdata <- raster::predict(Straight_RF2, StraightMeanDF.valid)
+
+#set up PDF file:
+pdf("Observed_vs_Predicted_withoutGeoDist.pdf", 4, 10,paper="letter")
+par(mfrow=c(3,1))
+
+#Internal validation:
+linearModI <- lm(Idata ~ PredictedIdata)
+cor(Idata,PredictedIdata) #0.8567832
+summary(linearModI) #Residual standard error: 0.04808 on 1643 degrees of freedom, Multiple R-squared:  0.7341,	Adjusted R-squared:  0.7339 , F-statistic:  4535 on 1 and 1643 DF,  p-value: < 2.2e-16
+plot(Idata, PredictedIdata, xlab="Training Data",ylab="Predicted from Out-of-Bag Samples",main="Internal Validation")
+abline(lm(Idata ~ PredictedIdata), col="red")
+text(0.52, 0.22, "R-squared:  0.7341 \n p-value: < 2.2e-16", col = "red")
+
+#linear model of Training data:
+linearModT <- lm(Tdata ~ PredictedTdata)
+cor(Tdata,PredictedTdata) #0.9766753
+summary(linearModT) #Residual standard error: 0.01982 on 1150 degrees of freedom, Multiple R-squared:  0.9539,	Adjusted R-squared:  0.9539, F-statistic: 2.379e+04 on 1 and 1150 DF,  p-value: < 2.2e-16
+plot(Tdata, PredictedTdata, xlab="Training Data",ylab="Predicted Training Data",main="Validation based on 70% Training Data")
+abline(lm(Tdata ~ PredictedTdata), col="red")
+text(0.52, 0.22, "R-squared:  0.9539 \n p-value: < 2.2e-16", col = "red")
+
+#linear model of Validation data:
+linearModV <- lm(Vdata ~ PredictedVdata)
+cor(Vdata,PredictedVdata) #0.8501442
+summary(linearModV) #Residual standard error: 0.05031 on 491 degrees of freedom, Multiple R-squared:  0.7227,	Adjusted R-squared:  0.7222 , F-statistic:  1280 on 1 and 491 DF,  p-value: < 2.2e-16
+plot(Vdata, PredictedVdata, xlab="Validation Data",ylab="Predicted Validation Data",main="Validation based on 30% Validation Data")
+abline(lm(Vdata ~ PredictedVdata), col="red")
+text(0.52, 0.22, "R-squared:  0.7227 \n p-value: < 2.2e-16", col = "red")
+
+
 dev.off()
 
-pdf("Straight_scatter_test.pdf", 5, 5)
-plot(StraightMeanDF.train$genetdist, predict(Straight_RF2, StraightMeanDF.train))
+StraightPred2 <- predict(env, Straight_RF2) #if i want to see the  model based on 70% of the data without geo. dist.
+
+
+###########################
+# Validate with a subsampling approach including geographic distance:
+###########################
+
+NumPairs = nrow(StraightMeanDF)
+Training = NumPairs * 0.7
+TrainingInt = round(Training)
+TrainingPairs = sample(1:NumPairs, TrainingInt, replace = FALSE)
+StraightMeanDF.train = StraightMeanDF[TrainingPairs,]
+StraightMeanDF.valid = StraightMeanDF[-TrainingPairs,]
+
+Straight_RF3 = randomForest(genetdist ~ geodist +
+                              Bio01_temp_mean_annual +
+                              Bio02_temp_mean_diurnal_range +
+                              Bio03_isothermality +
+                              Bio04_temp_seasonality +
+                              Bio05_temp_max_warmestMo +
+                              Bio06_temp_min_coldestMo +
+                              Bio07_temp_annual_range +
+                              Bio08_temp_mean_wettestQ +
+                              Bio09_temp_mean_driestQ +  
+                              Bio10_temp_mean_warmestQ +
+                              Bio11_temp_mean_coldestQ +
+                              Bio12_precip_annual +
+                              Bio13_precip_wettestMo +
+                              Bio14_precip_driestMo +
+                              Bio15_precip_seasonality +
+                              Bio16_precip_wettestQ +
+                              Bio17_precip_driestQ +
+                              Bio18_precip_warmestQ +
+                              Bio19_precip_coldestQ +
+                              Bio08S_temp_mean_wettestS +
+                              Bio09S_temp_mean_driestS +  
+                              Bio10S_temp_mean_warmestS +
+                              Bio11S_temp_mean_coldestS +
+                              Bio16S_precip_wettestS +
+                              Bio17S_precip_driestS +
+                              Bio18S_precip_warmestS +
+                              Bio19S_precip_coldestS +
+                              altitude +
+                              slope, importance=TRUE, na.action=na.omit, data=StraightMeanDF.train)
+
+
+#why aren't these the same value?
+Straight_rsq = tail(Straight_RF3$rsq ,1 ) 
+Straight_rsq_fromEquation = 1 - (tail(Straight_RF3$mse , 1) / var(StraightMeanDF.train$genetdist))     
+write.table(Straight_rsq, "RSQ_Table.txt")
+write.table(Straight_rsq_fromEquation, "RSQ_fromEquation_Table.txt")
+
+Straight_mse = tail(Straight_RF3$mse ,1 )  
+Straight_mse_fromEquation = mean ((predict(Straight_RF3, StraightMeanDF.train) - StraightMeanDF.train$genetdist)^2) 
+Straight_mse2 = mean ((predict(Straight_RF3, StraightMeanDF.valid) - StraightMeanDF.valid$genetdist)^2)
+write.table(Straight_mse, "MSE_Table.txt")
+write.table(Straight_mse_fromEquation, "MSE_fromEquation_Table.txt")
+write.table(Straight_mse2, "MSE2_Table.txt")
+
+#save these as variables and save to a table
+cor1 = cor(Straight_RF3$predict, StraightMeanDF.train$genetdist)
+cor2 = cor(predict(Straight_RF3, StraightMeanDF.valid), StraightMeanDF.valid$genetdist)
+write.table(cor1, "InternalValidation.txt")
+write.table(cor2, "ExternalValidation.txt")
+
+
+
+#Plot observed vs predicted
+Tdata <- StraightMeanDF.train$genetdist
+Vdata <- StraightMeanDF.valid$genetdist
+Idata <- StraightMeanDF$genetdist
+PredictedIdata <- Straight_RF1$predicted
+PredictedTdata <-raster::predict(Straight_RF3, StraightMeanDF.train)
+PredictedVdata <- raster::predict(Straight_RF3, StraightMeanDF.valid)
+
+#Start PDF file:
+pdf("Observed_vs_Predicted_withGeoDist.pdf", 4, 10,paper="letter")
+par(mfrow=c(3,1))
+
+#Internal validation:
+linearModI <- lm(Idata ~ PredictedIdata)
+cor(Idata,PredictedIdata) #0.8964952
+summary(linearModI) #Residual standard error: 0.04131 on 1643 degrees of freedom, Multiple R-squared:  0.8037,	Adjusted R-squared:  0.8036, F-statistic:  6727 on 1 and 1643 DF,  p-value: < 2.2e-16
+plot(Idata, PredictedIdata, xlab="Training Data",ylab="Predicted from Out-of-Bag Samples",main="Internal Validation with Geo. Dist.")
+abline(lm(Idata ~ PredictedIdata), col="red")
+text(0.52, 0.22, "R-squared:  0.8037 \np-value: < 2.2e-16", col = "red")
+
+#linear model of Training data:
+linearModT <- lm(Tdata ~ PredictedTdata)
+cor(Tdata,PredictedTdata) #0.9840072
+summary(linearModT) #Residual standard error: 0.01706 on 1150 degrees of freedom, Multiple R-squared:  0.9683,	Adjusted R-squared:  0.9682 , F-statistic: 3.509e+04 on 1 and 1150 DF,  p-value: < 2.2e-16
+plot(Tdata, PredictedTdata, xlab="Training Data",ylab="Predicted Training Data",main="Validation based on 70% Training Data with Geo. Dist.")
+abline(lm(Tdata ~ PredictedTdata), col="red")
+text(0.52, 0.22, "R-squared:  0.9683 \np-value: < 2.2e-16", col = "red")
+
+#linear model of Validation data:
+linearModV <- lm(Vdata ~ PredictedVdata)
+cor(Vdata,PredictedVdata) #0.8629154
+summary(linearModV) #Residual standard error: 0.04402 on 491 degrees of freedom, Multiple R-squared:  0.7446,	Adjusted R-squared:  0.7441 , F-statistic:  1432 on 1 and 491 DF,  p-value: < 2.2e-16
+plot(Vdata, PredictedVdata, xlab="Validation Data",ylab="Predicted Validation Data",main="Validation based on 30% Validation Data with Geo. Dist.")
+abline(lm(Vdata ~ PredictedVdata), col="red")
+text(0.52, 0.22, "R-squared:  0.7446 \np-value: < 2.2e-16", col = "red")
+
 dev.off()
 
-pdf("Straight_scatter2.pdf", 5, 5)
-plot(StraightMeanDF.valid$genetdist, predict(Straight_RF2, StraightMeanDF.valid))
-dev.off()
-
-StraightPred2 <- predict(env, Straight_RF2)
 
 
 ###########################
 #save project:
 ###########################
-save.image(file = "07a.GeneticRandomForestIterative.2019-06-18.RData")
+save.image(file = "07a.GeneticRandomForest.2019-06-22.RData")
 
 
 #write this as tif and remove it
 
 print("first prediction resistance surface done")
+
+
 
 EOF
 
@@ -2621,6 +2758,8 @@ git push -u origin master
 #username saarman
 #password Seadrag0n!
 
+
+#TODO: try iterations, see https://github.com/evlynpless/MOSQLAND/blob/master/RF/sc11C_iterativeRF_NAm2.R for example
 
 </pre>
 </html>
