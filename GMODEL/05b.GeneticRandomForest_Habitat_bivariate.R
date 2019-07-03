@@ -223,7 +223,7 @@ col.matrix<-colmat(nquantiles=9, xlab="Random Forest Genetic Connectivity", ylab
 #############################################
 #Load data from above:
 #############################################
-load("~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/04b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
+load("~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gff-Uganda-RF-Genetic-Model/05b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
 
 #############################################
 #plot all three maps with complementary colors:
@@ -272,4 +272,4 @@ pdf(file="Bivariate legend.pdf")
 col.matrix<-colmat(nquantiles=9, xlab="Random Forest Genetic Connectivity", ylab="MaxENT Habitat Suitability")
 dev.off()
 
-save.image(file = "04b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
+save.image(file = "05b.GeneticRandomForest_Habitat_bivariate.2019-04-09.RData")
