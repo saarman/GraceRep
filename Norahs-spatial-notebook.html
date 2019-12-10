@@ -2763,5 +2763,252 @@ git push -u origin master
 
 #NOTE: The seasonal Bioclim data layers sent in June 2019 were mislabelled, so use new layers in the future.
 
+
+<HR>
+<A NAME="12"></A>2019-12-10</A>- Task: Clip layers to California for prelim snake analysis </li>
+#NOTE: I copied Giuseppe's .bashrc file to my home directory so that the standard modules are loaded every time.
+#Following Evie's code https://github.com/evlynpless/MOSQLAND
+
+srun --pty --x11 -p interactive bash
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+mkdir /project/fas/caccone/nps25/RASTERS/CaliforniaClips
+
+###############################################
+#ARIDITY:  source of data https://github.com/evlynpless/MOSQLAND/blob/master/ARIDITY/sc01_cp_aridity.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 04a.ClipAridity.2019-12-10.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=04a.ClipAridity.2019-12-10.sh.log
+#SBATCH --job-name=04a.ClipAridity.2019-12-10.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/ARIDITY
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04a.ClipAridity.2019-12-10.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04a.ClipAridity.2019-12-10.sh.log
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ARIDITY
+RASTERNAME=AI_annual
+CLIPNAME=CaliforniaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -125 43 -113 32 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04a.ClipAridity.2019-12-10.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04a.ClipAridity.2019-12-10.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/CaliforniaClips/*
+openev /project/fas/caccone/nps25/RASTERS/CaliforniaClips/AI*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/CaliforniaClips/AI*.tif
+
+###############################################
+#Absolute humidity (ABSHUM) "ABS50_res": source of data https://github.com/evlynpless/MOSQLAND/blob/master/ABSHUM/sc01_get_ABSHUM.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 04b.ClipHumidity.2019-12-10.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=04b.ClipHumidity.2019-12-10.sh.log
+#SBATCH --job-name=04b.ClipHumidity.2019-12-10.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/ABSHUM
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04b.ClipHumidity.2019-12-10.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04b.ClipHumidity.2019-12-10.sh.log
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/ABSHUM
+RASTERNAME=ABS50_res
+CLIPNAME=CaliforniaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -125 43 -113 32 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata 199 --operator ">" -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04b.ClipHumidity.2019-12-10.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04b.ClipHumidity.2019-12-10.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/CaliforniaClips/AB*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/CaliforniaClips/AB*.tif
+#DO NOT USE, IT IS LOW RESOLUTION AND MISSING DATA IS MESSED UP
+
+###############################################
+#Elevation (MERIT) "altitude_1KMmedian_MERIT": source of data https://github.com/evlynpless/MOSQLAND/blob/master/MERIT/altitude/sc01_cp_altitude.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 04c.ClipElevation.2019-12-10.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=04c.ClipElevation.2019-12-10.sh.log
+#SBATCH --job-name=04c.ClipElevation.2019-12-10.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/MERIT/altitude
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04c.ClipElevation.2019-12-10.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04c.ClipElevation.2019-12-10.sh.log
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/MERIT/altitude
+RASTERNAME=altitude_1KMmedian_MERIT
+CLIPNAME=CaliforniaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -125 43 -113 32 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -9999 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04c.ClipElevation.2019-12-10.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04c.ClipElevation.2019-12-10.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/CaliforniaClips/alt*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/CaliforniaClips/alt*.tif
+
+###############################################
+#Slope (MERIT) "slope_1KMmedian_MERIT": source of data https://github.com/evlynpless/MOSQLAND/blob/master/MERIT/slope/sc01_cp_slope.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 04d.ClipSlope.2019-12-10.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=04d.ClipSlope.2019-12-10.sh.log
+#SBATCH --job-name=04d.ClipSlope.2019-12-10.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/MERIT/slope
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04d.ClipSlope.2019-12-10.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04d.ClipSlope.2019-12-10.sh.log
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/MERIT/slope
+RASTERNAME=slope_1KMmedian_MERIT
+CLIPNAME=CaliforniaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -125 43 -113 32 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -1 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04d.ClipSlope.2019-12-10.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04d.ClipSlope.2019-12-10.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/CaliforniaClips/sl*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/CaliforniaClips/sl*.tif
+
+###############################################
+#PET = potential evapo-transpiration "pet_mean": source of data https://github.com/evlynpless/MOSQLAND/blob/master/PET/sc01_cp_PET.sh
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 04e.ClipPET.2019-12-10.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=04e.ClipPET.2019-12-10.sh.log
+#SBATCH --job-name=04e.ClipPET.2019-12-10.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/PET
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04e.ClipPET.2019-12-10.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04e.ClipPET.2019-12-10.sh.log
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/PET
+RASTERNAME=pet_mean
+CLIPNAME=CaliforniaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s
+gdal_translate  -projwin -125 43 -113 32 $INDIR/${RASTERNAME}.tif  $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif
+pksetmask -i $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif --msknodata -16257 -nodata -999
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}_${CLIPNAME}.asc
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04e.ClipPET.2019-12-10.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04e.ClipPET.2019-12-10.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/*
+openev /project/fas/caccone/nps25/RASTERS/CaliforniaClips/pet*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/CaliforniaClips/pet*.tif
+
+
+###############################################
+#CHELSA all 19 data types (for 2010?), download script https://github.com/evlynpless/MOSQLAND/blob/master/bioclim/sc01_wget_bioclim.sh
+#Bio1 = Annual Mean Temperature
+#Bio2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))
+#Bio3 = Isothermality (BIO2/BIO7) (* 100)
+#Bio4 = Temperature Seasonality (standard deviation *100)
+#Bio5 = Max Temperature of Warmest Month
+#Bio6 = Min Temperature of Coldest Month
+#Bio7 = Temperature Annual Range
+#Bio8 = Mean Temperature of Wettest Quarter
+#Bio9 = Mean Temperature of Driest Quarter
+#Bio10 = Mean Temperature of Warmest Quarter
+#Bio11 = Mean Temperature of Coldest Quarter
+#Bio12 = Annual Precipitation
+#Bio13 = Precipitation of Wettest Month
+#Bio14 = Precipitation of Driest Month
+#Bio15 = Precipitation Seasonality (Coefficient of Variation)
+#Bio16 = Precipitation of Wettest Quarter
+#Bio17 = Precipitation of Driest Quarter
+#Bio18 = Precipitation of Warmest Quarter
+#Bio19 = Precipitation of Coldest Quarter
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/GMODEL
+cat << 'EOF' > 04f.ClipCHELSA19.2019-12-10.sh
+#!/bin/bash
+#SBATCH -p day 
+##SBATCH -n 1 -c 1  -N 1  
+##SBATCH -t 24:00:00
+#SBATCH --output=04f.ClipCHELSA19.2019-12-10.sh.log
+#SBATCH --job-name=04f.ClipCHELSA19.2019-12-10.sh
+##DATA SOURCE: https://github.com/evlynpless/MOSQLAND/tree/master/bioclim
+##COMMAND: sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04f.ClipCHELSA19.2019-12-10.sh
+##LOG FILE: cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04f.ClipCHELSA19.2019-12-10.sh.log
+module load PKTOOLS/2.6.7.6-foss-2018a
+module load GDAL/2.2.3-foss-2018a-Python-2.7.14
+INDIR=/project/fas/powell/esp38/dataproces/MOSQLAND/consland/chelsa
+RASTERNAME=CHELSA_2005_bio
+for n in $(seq 1 19 ); do
+CLIPNAME=CaliforniaClip
+OUTDIR=/project/fas/caccone/nps25/RASTERS/${CLIPNAME}s=
+pksetmask -i $OUTDIR/${RASTERNAME}${n}_${CLIPNAME}.tif -m $OUTDIR/${RASTERNAME}${n}_${CLIPNAME}.tif -o $OUTDIR/${RASTERNAME}${n}_${CLIPNAME}.tif --msknodata -32768 -nodata -999   
+gdal_translate -of AAIGrid $OUTDIR/${RASTERNAME}${n}_${CLIPNAME}.tif $OUTDIR/${RASTERNAME}${n}_${CLIPNAME}.asc
+done
+EOF
+
+sbatch /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04f.ClipCHELSA19.2019-12-10.sh
+
+#TO CHECK ON RUN AFTER COMPLETED:
+cat /gpfs/loomis/home.grace/fas/caccone/nps25/scripts/GraceRep/GMODEL/04f.ClipCHELSA19.2019-12-10.sh.log
+ls -l /project/fas/caccone/nps25/RASTERS/CaliforniaClips/*
+openev /project/fas/caccone/nps25/RASTERS/CaliforniaClips/CHELSA_2005_bio1_*.tif
+gdalinfo /project/fas/caccone/nps25/RASTERS/CaliforniaClips/CHELSA_2005_bio1_*.tif
+
+###############################################
+#locally, download .tif files:
+lcd ~/Dropbox/Norah_archives/Job\ Applications/UCLA\ La\ Kretz\ Dec10/CaliforniaClips
+mget /project/fas/caccone/nps25/RASTERS/CaliforniaClips/*.tif
+
+###############################################
+#commit your most recent work:
+###############################################
+cd /home/fas/caccone/nps25/scripts/GraceRep/
+git add --all
+git commit -m "Clipping scripts California"
+git push -u origin master
+#username saarman
+#password Seadrag0n!
+
 </pre>
 </html>
