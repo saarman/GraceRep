@@ -374,3 +374,28 @@ Loading required package: parallel
 > ###############################################>
 > # load individual pairwise data and calculate spatial lines
 > G.table.all <- read.table(file="Gpd_KenTza_11loci_659indv_indiv_pairwise.txt",header=T)
+> G.table <- data.frame(G.table.all[G.table.all$Ind1_siteID!=G.table.all$Ind2_siteID & G.table.all$Ind1_cluster==G.table.all$Ind2_cluster,])
+> unique.G.table <- unique.data.frame(G.table.all[G.table.all$Ind1_siteID!=G.table.all$Ind2_siteID & G.table.all$Ind1_cluster==G.table.all$Ind2_cluster,c("Ind1_pixelLong","Ind1_pixelLat","Ind2_pixelLong","Ind2_pixelLat")])
+> 
+> ###############################################>
+> begin.table <- unique.G.table[,c("Ind1_pixelLong","Ind1_pixelLat")]
+> begin.coord <- begin.table
+> begin.Sp.points <- SpatialPoints(begin.coord)
+> 
+> end.table <- unique.G.table[,c("Ind2_pixelLong","Ind2_pixelLat")]
+> end.coord <- end.table
+> end.Sp.points <- SpatialPoints(end.coord)
+> ###############################################>
+> l <- psp(begin.table[,1], begin.table[,2], end.table[,1], end.table[,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
+> spatial.l <- as(l, "SpatialLines")
+> proj4string(spatial.l) <- crs.geo  # define projection system of our data
+> 
+> # Plot unique lines as SpatialLines
+> ###############################################>
+> plot(env$Bio19S_precip_coldestS,axes=FALSE, box=FALSE)
+> map(,ylim=c(-4.8, 5),xlim=c(33.7, 42.5),add=T)
+> plot(spatial.l,add=T)
+> 
+> # Calculate mean of unique lines for each variable
+> registerDoMC(cores=detectCores()) #get parallelization set up
+> StraightMean <- raster::extract(env, spatial.l, fun=mean, na.rm=TRUE)
