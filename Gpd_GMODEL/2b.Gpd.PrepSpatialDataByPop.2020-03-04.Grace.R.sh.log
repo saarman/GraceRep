@@ -167,3 +167,325 @@ Loading required package: parallel
 > raster01 <- raster01I*1
 > raster02 <- raster02I*1
 > raster03 <- raster03I*1
+> raster04 <- raster04I*1
+> raster05 <- raster05I*1
+> raster06 <- raster06I*1
+> raster07 <- raster07I*1
+> raster08 <- raster08I*1
+> raster09 <- raster09I*1
+> raster10 <- raster10I*1
+> raster11 <- raster11I*1
+> raster12 <- raster12I*1
+> raster13 <- raster13I*1
+> raster14 <- raster14I*1
+> raster15 <- raster15I*1
+> raster16 <- raster16I*1
+> raster17 <- raster17I*1
+> raster18 <- raster18I*1
+> raster19 <- raster19I*1
+> raster20 <- raster20I*1
+> raster21 <- raster21I*1
+> raster22 <- raster22I*1
+> raster23 <- raster23I*1
+> raster24 <- raster24I*1
+> raster25 <- raster25I*1
+> raster26 <- raster26I*1
+> raster27 <- raster27I*1
+> raster28 <- raster28I*1
+> raster29 <- raster29I*1
+> raster30 <- raster30I*1
+> 
+> #make sure the projection is correct for each:
+> proj4string(raster01) <- crs.geo
+> proj4string(raster02) <- crs.geo
+> proj4string(raster03) <- crs.geo
+> proj4string(raster04) <- crs.geo
+> proj4string(raster05) <- crs.geo
+> proj4string(raster06) <- crs.geo
+> proj4string(raster07) <- crs.geo
+> proj4string(raster08) <- crs.geo
+> proj4string(raster09) <- crs.geo
+> proj4string(raster10) <- crs.geo
+> proj4string(raster11) <- crs.geo
+> proj4string(raster12) <- crs.geo
+> proj4string(raster13) <- crs.geo
+> proj4string(raster14) <- crs.geo
+> proj4string(raster15) <- crs.geo
+> proj4string(raster16) <- crs.geo
+> proj4string(raster17) <- crs.geo
+> proj4string(raster18) <- crs.geo
+> proj4string(raster19) <- crs.geo
+> proj4string(raster20) <- crs.geo
+> proj4string(raster21) <- crs.geo
+> proj4string(raster22) <- crs.geo
+> proj4string(raster23) <- crs.geo
+> proj4string(raster24) <- crs.geo
+> proj4string(raster25) <- crs.geo
+> proj4string(raster26) <- crs.geo
+> proj4string(raster27) <- crs.geo
+> proj4string(raster28) <- crs.geo
+> proj4string(raster29) <- crs.geo
+> proj4string(raster30) <- crs.geo
+> 
+> env=stack(raster01,
++           raster02,
++           raster03,
++           raster04,
++           raster05,
++           raster06,
++           raster07,
++           raster08,
++           raster09,
++           raster10,
++           raster11,
++           raster12,
++           raster13,
++           raster14,
++           raster15,
++           raster16,
++           raster17,
++           raster18,
++           raster19,
++           raster20,
++           raster21,
++           raster22,
++           raster23,
++           raster24,
++           raster25,
++           raster26,
++           raster27,
++           raster28,
++           raster29)
+> pixels <- raster30
+> 
+> 
+> ##BIO1-BIO19 are the bioclim variables. If it has an "S" at the end, it is the seasonal (rather than quarterly) adaptation of the corresponding bioclim variable. 
+> names(env) [1] <-   "Bio08S_temp_mean_wettestS"
+> names(env) [2] <-   "Bio09S_temp_mean_driestS"  
+> names(env) [3] <-   "Bio10S_temp_mean_warmestS"
+> names(env) [4] <-   "Bio11S_temp_mean_coldestS"
+> names(env) [5] <-   "Bio16S_precip_wettestS"
+> names(env) [6] <-   "Bio17S_precip_driestS"
+> names(env) [7] <-   "Bio18S_precip_warmestS"
+> names(env) [8] <-   "Bio19S_precip_coldestS"
+> names(env) [9]  <-  "Bio01_temp_mean_annual"
+> names(env) [10]  <- "Bio02_temp_mean_diurnal_range"
+> names(env) [11]  <- "Bio03_isothermality"
+> names(env) [12]  <- "Bio04_temp_seasonality"
+> names(env) [13]  <- "Bio05_temp_max_warmestMo"
+> names(env) [14]  <- "Bio06_temp_min_coldestMo"
+> names(env) [15]  <- "Bio07_temp_annual_range"
+> names(env) [16]  <- "Bio08_temp_mean_wettestQ"
+> names(env) [17]  <- "Bio09_temp_mean_driestQ"  
+> names(env) [18]  <- "Bio10_temp_mean_warmestQ"
+> names(env) [19]  <- "Bio11_temp_mean_coldestQ"
+> names(env) [20]  <- "Bio12_precip_annual"
+> names(env) [21]  <- "Bio13_precip_wettestMo"
+> names(env) [22]  <- "Bio14_precip_driestMo"
+> names(env) [23]  <- "Bio15_precip_seasonality"
+> names(env) [24]  <- "Bio16_precip_wettestQ"
+> names(env) [25]  <- "Bio17_precip_driestQ"
+> names(env) [26]  <- "Bio18_precip_warmestQ"
+> names(env) [27]  <- "Bio19_precip_coldestQ"
+> names(env) [28]  <- "slope"
+> names(env) [29]  <- "altitude"
+> names(pixels) <- "pixels"
+> 
+> #NOTE: If you add future, the names of the rasters in the stack have to be the same as the current ones used in building the model.
+> #NOTE: current temperature rasters are in ˚K*10. future temperature rasters are in ˚C*10... so the conversion from future to current for temperature is current=raster01F/10)+273.15)*10.
+> 
+> 
+> #clean up objects
+> x <- c("raster01I")
+> x <- c(x, "raster02I")
+> x <- c(x, "raster03I")
+> x <- c(x, "raster04I")
+> x <- c(x, "raster05I")
+> x <- c(x, "raster06I")
+> x <- c(x, "raster07I")
+> x <- c(x, "raster08I")
+> x <- c(x, "raster09I")
+> x <- c(x, "raster10I")
+> x <- c(x, "raster11I")
+> x <- c(x, "raster12I")
+> x <- c(x, "raster13I")
+> x <- c(x, "raster14I")
+> x <- c(x, "raster15I")
+> x <- c(x, "raster16I")
+> x <- c(x, "raster17I")
+> x <- c(x, "raster18I")
+> x <- c(x, "raster19I")
+> x <- c(x, "raster20I")
+> x <- c(x, "raster21I")
+> x <- c(x, "raster22I")
+> x <- c(x, "raster23I")
+> x <- c(x, "raster24I")
+> x <- c(x, "raster25I")
+> x <- c(x, "raster26I")
+> x <- c(x, "raster27I")
+> x <- c(x, "raster28I")
+> x <- c(x, "raster29I")
+> x <- c(x, "raster30I")
+> x <- c(x, "raster01")
+> x <- c(x, "raster02")
+> x <- c(x, "raster03")
+> x <- c(x, "raster04")
+> x <- c(x, "raster05")
+> x <- c(x, "raster06")
+> x <- c(x, "raster07")
+> x <- c(x, "raster08")
+> x <- c(x, "raster09")
+> x <- c(x, "raster10")
+> x <- c(x, "raster11")
+> x <- c(x, "raster12")
+> x <- c(x, "raster13")
+> x <- c(x, "raster14")
+> x <- c(x, "raster15")
+> x <- c(x, "raster16")
+> x <- c(x, "raster17")
+> x <- c(x, "raster18")
+> x <- c(x, "raster19")
+> x <- c(x, "raster20")
+> x <- c(x, "raster21")
+> x <- c(x, "raster22")
+> x <- c(x, "raster23")
+> x <- c(x, "raster24")
+> x <- c(x, "raster25")
+> x <- c(x, "raster26")
+> x <- c(x, "raster27")
+> x <- c(x, "raster28")
+> x <- c(x, "raster29")
+> x <- c(x, "raster30")
+> rm(list=x)
+> 
+> #map a few variables
+> plot(env$Bio19S_precip_coldestS,axes=FALSE, box=FALSE)
+> map(,ylim=c(-4.8, 5),xlim=c(33.7, 42.5),add=T)
+> plot(pixels,axes=FALSE, box=FALSE)
+> map(,ylim=c(-4.8, 5),xlim=c(33.7, 42.5),add=T)
+> 
+> ###############################################
+> # pop pairwise data
+> ###############################################
+> #load sampling site "pop" pairwise data and calculate spatial lines
+> G.table.all <- read.table(file="Gpd_KenTza_11loci_659indv_pop_pairwise.txt",header=T)
+> G.table <- data.frame(G.table.all[G.table.all$Pop1_cluster==G.table.all$Pop2_cluster,])
+> 
+> unique.G.table <- unique.data.frame(G.table.all[G.table.all$Pop1_cluster==G.table.all$Pop2_cluster,c("Pop1_centroidLong","Pop1_centroidLat","Pop2_centroidLong","Pop2_centroidLat")])
+> 
+> begin.table <- unique.G.table[,c("Pop1_centroidLong","Pop1_centroidLat")]
+> begin.coord <- begin.table
+> begin.Sp.points <- SpatialPoints(begin.coord)
+> 
+> end.table <- unique.G.table[,c("Pop2_centroidLong","Pop2_centroidLat")]
+> end.coord <- end.table
+> end.Sp.points <- SpatialPoints(end.coord)
+> 
+> l <- psp(begin.table[,1], begin.table[,2], end.table[,1], end.table[,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
+> 
+> spatial.l <- as(l, "SpatialLines")
+> proj4string(spatial.l) <- crs.geo  # define projection system of our data
+> 
+> 
+> #Plot unique lines as SpatialLines
+> plot(env$Bio19S_precip_coldestS,axes=FALSE, box=FALSE)
+> map(,ylim=c(-4.8, 5),xlim=c(33.7, 42.5),add=T)
+> plot(spatial.l,add=T)
+> 
+> 
+> #Calculate mean of unique lines for each variable
+> registerDoMC(cores=detectCores()) #get parallelization set up
+> StraightMean <- raster::extract(env, spatial.l, fun=mean, na.rm=TRUE)
+> summary(StraightMean)
+ Bio08S_temp_mean_wettestS Bio09S_temp_mean_driestS Bio10S_temp_mean_warmestS
+ Min.   :2928              Min.   :2912             Min.   :2921             
+ 1st Qu.:2941              1st Qu.:2933             1st Qu.:2937             
+ Median :2946              Median :2942             Median :2944             
+ Mean   :2961              Mean   :2948             Mean   :2959             
+ 3rd Qu.:2983              3rd Qu.:2958             3rd Qu.:2981             
+ Max.   :3011              Max.   :2992             Max.   :3011             
+ Bio11S_temp_mean_coldestS Bio16S_precip_wettestS Bio17S_precip_driestS
+ Min.   :2924              Min.   : 13.51         Min.   : 19.68       
+ 1st Qu.:2939              1st Qu.: 39.42         1st Qu.: 30.91       
+ Median :2946              Median :110.63         Median : 43.32       
+ Mean   :2958              Mean   : 86.01         Mean   : 48.61       
+ 3rd Qu.:2978              3rd Qu.:121.59         3rd Qu.: 59.58       
+ Max.   :3006              Max.   :148.87         Max.   :124.75       
+ Bio18S_precip_warmestS Bio19S_precip_coldestS Bio01_temp_mean_annual
+ Min.   : 51.85         Min.   :19.20          Min.   :2918          
+ 1st Qu.: 66.20         1st Qu.:43.43          1st Qu.:2937          
+ Median :120.77         Median :67.54          Median :2944          
+ Mean   :113.30         Mean   :60.55          Mean   :2955          
+ 3rd Qu.:148.97         3rd Qu.:78.13          3rd Qu.:2971          
+ Max.   :181.55         Max.   :88.96          Max.   :3003          
+ Bio02_temp_mean_diurnal_range Bio03_isothermality Bio04_temp_seasonality
+ Min.   : 38.59                Min.   :53.40       Min.   : 521.9        
+ 1st Qu.: 82.56                1st Qu.:63.31       1st Qu.: 787.6        
+ Median : 92.50                Median :73.46       Median : 897.5        
+ Mean   : 88.86                Mean   :70.49       Mean   : 973.1        
+ 3rd Qu.: 99.43                3rd Qu.:76.35       3rd Qu.:1159.7        
+ Max.   :104.15                Max.   :78.93       Max.   :1563.1        
+ Bio05_temp_max_warmestMo Bio06_temp_min_coldestMo Bio07_temp_annual_range
+ Min.   :2994             Min.   :2853             Min.   : 71.31         
+ 1st Qu.:3008             1st Qu.:2876             1st Qu.:120.14         
+ Median :3012             Median :2887             Median :129.31         
+ Mean   :3021             Mean   :2895             Mean   :125.74         
+ 3rd Qu.:3036             3rd Qu.:2906             3rd Qu.:134.82         
+ Max.   :3063             Max.   :2968             Max.   :146.68         
+ Bio08_temp_mean_wettestQ Bio09_temp_mean_driestQ Bio10_temp_mean_warmestQ
+ Min.   :2920             Min.   :2910            Min.   :2930            
+ 1st Qu.:2936             1st Qu.:2933            1st Qu.:2946            
+ Median :2942             Median :2944            Median :2954            
+ Mean   :2956             Mean   :2949            Mean   :2966            
+ 3rd Qu.:2976             3rd Qu.:2958            3rd Qu.:2986            
+ Max.   :3009             Max.   :3010            Max.   :3015            
+ Bio11_temp_mean_coldestQ Bio12_precip_annual Bio13_precip_wettestMo
+ Min.   :2907             Min.   : 398.9      Min.   :134.1         
+ 1st Qu.:2929             1st Qu.: 579.3      1st Qu.:160.5         
+ Median :2937             Median : 918.4      Median :236.1         
+ Mean   :2943             Mean   : 897.6      Mean   :234.1         
+ 3rd Qu.:2953             3rd Qu.:1127.1      3rd Qu.:286.5         
+ Max.   :2989             Max.   :1527.4      Max.   :368.1         
+ Bio14_precip_driestMo Bio15_precip_seasonality Bio16_precip_wettestQ
+ Min.   : 0.3414       Min.   : 55.98           Min.   :221.4        
+ 1st Qu.: 2.7738       1st Qu.: 90.58           1st Qu.:299.9        
+ Median : 5.4160       Median : 95.60           Median :474.5        
+ Mean   : 7.9149       Mean   : 95.83           Mean   :436.6        
+ 3rd Qu.:10.2129       3rd Qu.:101.76           3rd Qu.:531.8        
+ Max.   :34.3128       Max.   :130.69           Max.   :616.8        
+ Bio17_precip_driestQ Bio18_precip_warmestQ Bio19_precip_coldestQ
+ Min.   : 10.49       Min.   : 72.36        Min.   : 21.21       
+ 1st Qu.: 30.25       1st Qu.:164.43        1st Qu.: 63.85       
+ Median : 46.04       Median :176.07        Median :159.87       
+ Mean   : 60.24       Mean   :196.50        Mean   :170.49       
+ 3rd Qu.: 80.36       3rd Qu.:242.76        3rd Qu.:258.43       
+ Max.   :191.73       Max.   :320.04        Max.   :411.72       
+     slope           altitude      
+ Min.   :0.1455   Min.   :  14.04  
+ 1st Qu.:1.4835   1st Qu.: 711.28  
+ Median :2.1430   Median :1399.32  
+ Mean   :2.2892   Mean   :1131.77  
+ 3rd Qu.:3.0409   3rd Qu.:1546.84  
+ Max.   :6.5548   Max.   :1912.97  
+> gc() #to see how much memory was used.
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  3181760 170.0    4741687 253.3  4741687 253.3
+Vcells 42281033 322.6   64900073 495.2 61565632 469.8
+> 
+> 
+> #calculate sum of pixels along straight lines
+> StraightSumPixels <- raster::extract(pixels, spatial.l, fun=sum, na.rm=TRUE)
+> summary(StraightSumPixels)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    2.0   124.0   219.5   236.5   340.8   705.0 
+> 
+> 
+> #create a final data table
+> StriaghtLinesTable <- cbind(unique.G.table,as.data.frame(StraightMean),as.data.frame(StraightSumPixels))
+> StraightLinesDF <- left_join(G.table,StriaghtLinesTable)
+Joining, by = c("Pop1_centroidLong", "Pop1_centroidLat", "Pop2_centroidLong", "Pop2_centroidLat")
+> 
+> 
+> #save file
+> save.image(file="2b.Gpd.PrepSpatialDataByPop.2020-03-04.Grace.RData")
+> 
