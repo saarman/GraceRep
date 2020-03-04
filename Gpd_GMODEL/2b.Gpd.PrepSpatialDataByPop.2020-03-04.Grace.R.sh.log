@@ -1,0 +1,10 @@
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) StdEnv
+> ###############################################
+> #R Script: Note that this is also tested locally as "~/Dropbox/Caccone_Aksoy/Glossina-spatial/Gpd-RF-Genetic-Model/2b.Gpd.PrepSpatialDataByPop.2020-03-04.Rmd"
+> ###############################################
+> #first thing you do is load the library that is for this analysis
+> library("raster")
+Loading required package: sp
