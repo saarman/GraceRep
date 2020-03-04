@@ -8,3 +8,162 @@ The following modules were not unloaded:
 > #first thing you do is load the library that is for this analysis
 > library("raster")
 Loading required package: sp
+> library("rgdal")
+rgdal: version: 1.4-7, (SVN revision 845)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 3.0.1, released 2019/06/28
+ Path to GDAL shared files: 
+ GDAL binary built with GEOS: TRUE 
+ Loaded PROJ.4 runtime: Rel. 6.1.1, July 1st, 2019, [PJ_VERSION: 611]
+ Path to PROJ.4 shared files: /gpfs/loomis/project/caccone/nps25/conda_envs/parallel_r/share/proj
+ Linking to sp version: 1.3-1 
+> library("dismo")
+> library("XML")
+> library("maps")
+> library("sp")
+> library("spatstat")
+Loading required package: spatstat.data
+Loading required package: nlme
+
+Attaching package: ‘nlme’
+
+The following object is masked from ‘package:raster’:
+
+    getData
+
+Loading required package: rpart
+
+spatstat 1.63-3       (nickname: ‘Wet paint’) 
+For an introduction to spatstat, type ‘beginner’ 
+
+
+Attaching package: ‘spatstat’
+
+The following object is masked from ‘package:dismo’:
+
+    domain
+
+The following objects are masked from ‘package:raster’:
+
+    area, rotate, shift
+
+> library("maptools")
+Checking rgeos availability: FALSE
+ 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
+ 	which has a restricted licence. It is disabled by default;
+ 	to enable gpclib, type gpclibPermit()
+> library("randomForest")
+randomForest 4.6-14
+Type rfNews() to see new features/changes/bug fixes.
+> library("gdistance")
+Loading required package: igraph
+
+Attaching package: ‘igraph’
+
+The following objects are masked from ‘package:spatstat’:
+
+    diameter, edges, is.connected, vertices
+
+The following object is masked from ‘package:raster’:
+
+    union
+
+The following objects are masked from ‘package:stats’:
+
+    decompose, spectrum
+
+The following object is masked from ‘package:base’:
+
+    union
+
+Loading required package: Matrix
+
+Attaching package: ‘gdistance’
+
+The following object is masked from ‘package:igraph’:
+
+    normalize
+
+> library("dplyr")
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:igraph’:
+
+    as_data_frame, groups, union
+
+The following object is masked from ‘package:randomForest’:
+
+    combine
+
+The following object is masked from ‘package:nlme’:
+
+    collapse
+
+The following objects are masked from ‘package:raster’:
+
+    intersect, select, union
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library("foreach")
+> library("doParallel")
+Loading required package: iterators
+Loading required package: parallel
+> library("doMC")
+> 
+> #set working directory
+> setwd("~/project/Gpd_GMODEL")
+> 
+> #set coordinate system for mapping
+> crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") 
+> 
+> ###############################################>
+> #Create raster stack 
+> ###############################################>
+> #Load a stack of raster layers
+> rast_stack <- stack("/home/nps25/project/RASTERS/KenyaClips/chelsa_merit_vars_kenya.tif") 
+> names(rast_stack) <- c(paste0("BIO",c(8:11),"S"),paste0("BIO",c(16:19),"S"),paste0("BIO",c(1:19)),"slope","altitude")
+> 
+> #isolate each raster layer 
+> raster01I = subset(rast_stack, 1)
+> raster02I = subset(rast_stack, 2)
+> raster03I = subset(rast_stack, 3)
+> raster04I = subset(rast_stack, 4)
+> raster05I = subset(rast_stack, 5)
+> raster06I = subset(rast_stack, 6)
+> raster07I = subset(rast_stack, 7)
+> raster08I = subset(rast_stack, 8)
+> raster09I = subset(rast_stack, 9)
+> raster10I = subset(rast_stack, 10)
+> raster11I = subset(rast_stack, 11)
+> raster12I = subset(rast_stack, 12)
+> raster13I = subset(rast_stack, 13)
+> raster14I = subset(rast_stack, 14)
+> raster15I = subset(rast_stack, 15)
+> raster16I = subset(rast_stack, 16)
+> raster17I = subset(rast_stack, 17)
+> raster18I = subset(rast_stack, 18)
+> raster19I = subset(rast_stack, 19)
+> raster20I = subset(rast_stack, 20)
+> raster21I = subset(rast_stack, 21)
+> raster22I = subset(rast_stack, 22)
+> raster23I = subset(rast_stack, 23)
+> raster24I = subset(rast_stack, 24)
+> raster25I = subset(rast_stack, 25)
+> raster26I = subset(rast_stack, 26)
+> raster27I = subset(rast_stack, 27)
+> raster28I = subset(rast_stack, 28)
+> raster29I = subset(rast_stack, 29)
+> raster30I = (raster29I*0)+1 #all pixels are 1
+> 
+> #The "I" times 1 puts the raster in active memory
+> raster01 <- raster01I*1
+> raster02 <- raster02I*1
+> raster03 <- raster03I*1
