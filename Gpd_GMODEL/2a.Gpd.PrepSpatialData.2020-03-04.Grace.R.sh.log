@@ -399,3 +399,94 @@ Loading required package: parallel
 > # Calculate mean of unique lines for each variable
 > registerDoMC(cores=detectCores()) #get parallelization set up
 > StraightMean <- raster::extract(env, spatial.l, fun=mean, na.rm=TRUE)
+> summary(StraightMean)
+ Bio08S_temp_mean_wettestS Bio09S_temp_mean_driestS Bio10S_temp_mean_warmestS
+ Min.   :2929              Min.   :2912             Min.   :2921             
+ 1st Qu.:2942              1st Qu.:2935             1st Qu.:2939             
+ Median :2949              Median :2945             Median :2947             
+ Mean   :2965              Mean   :2952             Mean   :2963             
+ 3rd Qu.:2996              3rd Qu.:2969             3rd Qu.:2993             
+ Max.   :3011              Max.   :2992             Max.   :3011             
+ Bio11S_temp_mean_coldestS Bio16S_precip_wettestS Bio17S_precip_driestS
+ Min.   :2924              Min.   : 13.30         Min.   : 19.65       
+ 1st Qu.:2941              1st Qu.: 37.52         1st Qu.: 30.97       
+ Median :2949              Median :101.41         Median : 41.33       
+ Mean   :2962              Mean   : 81.95         Mean   : 48.52       
+ 3rd Qu.:2990              3rd Qu.:122.19         3rd Qu.: 57.68       
+ Max.   :3006              Max.   :149.84         Max.   :125.23       
+ Bio18S_precip_warmestS Bio19S_precip_coldestS Bio01_temp_mean_annual
+ Min.   : 49.84         Min.   :18.39          Min.   :2918          
+ 1st Qu.: 64.92         1st Qu.:38.00          1st Qu.:2938          
+ Median :111.21         Median :68.16          Median :2947          
+ Mean   :109.91         Mean   :58.80          Mean   :2959          
+ 3rd Qu.:148.02         3rd Qu.:78.49          3rd Qu.:2983          
+ Max.   :181.73         Max.   :89.53          Max.   :3003          
+ Bio02_temp_mean_diurnal_range Bio03_isothermality Bio04_temp_seasonality
+ Min.   : 38.27                Min.   :53.32       Min.   : 521.2        
+ 1st Qu.: 75.78                1st Qu.:62.88       1st Qu.: 788.6        
+ Median : 92.18                Median :72.77       Median : 916.1        
+ Mean   : 86.41                Mean   :69.71       Mean   : 969.3        
+ 3rd Qu.: 98.90                3rd Qu.:76.06       3rd Qu.:1157.8        
+ Max.   :104.15                Max.   :78.92       Max.   :1563.1        
+ Bio05_temp_max_warmestMo Bio06_temp_min_coldestMo Bio07_temp_annual_range
+ Min.   :2994             Min.   :2853             Min.   : 70.87         
+ 1st Qu.:3009             1st Qu.:2877             1st Qu.:116.30         
+ Median :3014             Median :2891             Median :126.73         
+ Mean   :3024             Mean   :2900             Mean   :123.17         
+ 3rd Qu.:3042             3rd Qu.:2923             3rd Qu.:134.02         
+ Max.   :3063             Max.   :2968             Max.   :146.74         
+ Bio08_temp_mean_wettestQ Bio09_temp_mean_driestQ Bio10_temp_mean_warmestQ
+ Min.   :2920             Min.   :2910            Min.   :2930            
+ 1st Qu.:2937             1st Qu.:2936            1st Qu.:2948            
+ Median :2945             Median :2946            Median :2956            
+ Mean   :2960             Mean   :2954            Mean   :2970            
+ 3rd Qu.:2988             3rd Qu.:2970            3rd Qu.:2998            
+ Max.   :3009             Max.   :3010            Max.   :3015            
+ Bio11_temp_mean_coldestQ Bio12_precip_annual Bio13_precip_wettestMo
+ Min.   :2907             Min.   : 382.7      Min.   :128.8         
+ 1st Qu.:2930             1st Qu.: 568.1      1st Qu.:169.3         
+ Median :2940             Median : 891.8      Median :225.4         
+ Mean   :2948             Mean   : 878.6      Mean   :230.0         
+ 3rd Qu.:2964             3rd Qu.:1116.4      3rd Qu.:285.4         
+ Max.   :2989             Max.   :1525.0      Max.   :366.6         
+ Bio14_precip_driestMo Bio15_precip_seasonality Bio16_precip_wettestQ
+ Min.   : 0.3393       Min.   : 53.70           Min.   :212.5        
+ 1st Qu.: 2.2107       1st Qu.: 90.16           1st Qu.:302.5        
+ Median : 4.2989       Median : 95.81           Median :465.8        
+ Mean   : 7.5133       Mean   : 96.23           Mean   :430.8        
+ 3rd Qu.: 9.7438       3rd Qu.:104.96           3rd Qu.:532.9        
+ Max.   :34.2870       Max.   :131.08           Max.   :616.7        
+ Bio17_precip_driestQ Bio18_precip_warmestQ Bio19_precip_coldestQ
+ Min.   : 10.39       Min.   : 72.05        Min.   : 21.17       
+ 1st Qu.: 26.69       1st Qu.:138.67        1st Qu.: 67.59       
+ Median : 41.05       Median :173.47        Median :158.11       
+ Mean   : 57.71       Mean   :185.14        Mean   :174.65       
+ 3rd Qu.: 77.15       3rd Qu.:224.77        3rd Qu.:271.47       
+ Max.   :191.58       Max.   :318.73        Max.   :414.52       
+     slope           altitude      
+ Min.   :0.1376   Min.   :  13.35  
+ 1st Qu.:1.1026   1st Qu.: 440.87  
+ Median :1.9037   Median :1333.67  
+ Mean   :1.9751   Mean   :1046.44  
+ 3rd Qu.:2.5410   3rd Qu.:1527.79  
+ Max.   :6.3764   Max.   :1911.43  
+> gc()
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  3407026 182.0    6561261 350.5  6561261 350.5
+Vcells 48286856 368.4   93632104 714.4 88770528 677.3
+> 
+> # calculate sum of pixels along straight lines
+> ###############################################>
+> StraightSumPixels <- raster::extract(pixels, spatial.l, fun=sum, na.rm=TRUE)
+> summary(StraightSumPixels) 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    2.0   138.5   246.0   252.1   360.0   707.0 
+> 
+> # create a final data table
+> ###############################################>
+> StriaghtLinesTable <- cbind(unique.G.table,as.data.frame(StraightMean),as.data.frame(StraightSumPixels))
+> StraightLinesDF <- left_join(G.table,StriaghtLinesTable)
+Joining, by = c("Ind1_pixelLong", "Ind1_pixelLat", "Ind2_pixelLong", "Ind2_pixelLat")
+> 
+> save.image(file="2a.Gpd.PrepSpatialData.2020-03-04.Grace.RData")
+> 
