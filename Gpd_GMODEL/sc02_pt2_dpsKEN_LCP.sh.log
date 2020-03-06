@@ -1,118 +1,24 @@
+
+Attaching package: ‘raster’
+
+The following objects are masked from ‘package:spatstat’:
+
+    area, rotate, shift
+
+The following object is masked from ‘package:nlme’:
+
+    getData
+
+> library("randomForest")
+randomForest 4.6-14
+Type rfNews() to see new features/changes/bug fixes.
+> library("gdistance")
+Loading required package: igraph
 The following modules were not unloaded:
   (Use "module --force purge" to unload all):
 
   1) StdEnv
 
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:igraph’:
-
-    as_data_frame, groups, union
-
-The following object is masked from ‘package:randomForest’:
-
-    combine
-
-The following objects are masked from ‘package:raster’:
-
-    intersect, select, union
-
-The following object is masked from ‘package:nlme’:
-
-    collapse
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union
-
-> 
-> load("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeoRF_pt1.RData")
-> #Import foldnum for 10-fold cross validation
-> 
-> foldnum<-Sys.getenv(c('foldnum'))
-> print(foldnum)
-[1] "2"
-> 
-> #Import packages
-> library("sp")
-> library("spatstat")
-Loading required package: spatstat.data
-Loading required package: nlme
-Loading required package: rpart
-
-spatstat 1.63-3       (nickname: ‘Wet paint’) 
-For an introduction to spatstat, type ‘beginner’ 
-
-> library("maptools")
-> #Import foldnum for 10-fold cross validation
-> 
-> foldnum<-Sys.getenv(c('foldnum'))
-> print(foldnum)
-[1] "3"
-> 
-> #Import packages
-> library("sp")
-Checking rgeos availability: FALSE
- 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
- 	which has a restricted licence. It is disabled by default;
- 	to enable gpclib, type gpclibPermit()
-> library("raster")
-> 
-> crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
-> library("spatstat")
-Loading required package: spatstat.data
-Loading required package: nlme
-Loading required package: rpart
-
-spatstat 1.63-3       (nickname: ‘Wet paint’) 
-For an introduction to spatstat, type ‘beginner’ 
-
-> library("maptools")
-
-Attaching package: ‘raster’
-
-The following objects are masked from ‘package:spatstat’:
-
-    area, rotate, shift
-
-The following object is masked from ‘package:nlme’:
-
-    getData
-
-> library("randomForest")
-randomForest 4.6-14
-Type rfNews() to see new features/changes/bug fixes.
-> library("gdistance")
-Checking rgeos availability: FALSE
- 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
- 	which has a restricted licence. It is disabled by default;
- 	to enable gpclib, type gpclibPermit()
-> library("raster")
-Loading required package: igraph
-> 
-> rmr=function(x){
-+   ## function to truly delete raster and temporary files associated with them
-+   if(class(x)=="RasterLayer"&grepl("^/tmp",x@file@name)&fromDisk(x)==T){
-+     file.remove(x@file@name,sub("grd","gri",x@file@name))
-+     rm(x)
-+   }
-+ }
-> 
-> 
-> ###############################################
-> #Plot lines as SpatialLines:
-> ###############################################
-> 
-> #Plot straight lines for first iteration of RF
-> 
-> #need to download test
-> 
-> Test.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotestData_", foldnum, ".csv"), sep=",", header=T)
-
 Attaching package: ‘igraph’
 
 The following object is masked from ‘package:raster’:
@@ -132,10 +38,6 @@ The following object is masked from ‘package:base’:
     union
 
 Loading required package: Matrix
-> #For testing;
-> #Test.table <- Test.table[1:10,]
-> 
-> Train.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotrainData_", foldnum, ".csv"), sep=",", header=T)
 
 Attaching package: ‘gdistance’
 
@@ -180,6 +82,111 @@ The following objects are masked from ‘package:base’:
 
 > 
 > load("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeoRF_pt1.RData")
+> 
+> crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
+> 
+> rmr=function(x){
++   ## function to truly delete raster and temporary files associated with them
++   if(class(x)=="RasterLayer"&grepl("^/tmp",x@file@name)&fromDisk(x)==T){
++     file.remove(x@file@name,sub("grd","gri",x@file@name))
++     rm(x)
++   }
++ }
+> 
+> 
+> ###############################################
+> #Plot lines as SpatialLines:
+> ###############################################
+> 
+> #Plot straight lines for first iteration of RF
+> 
+> #need to download test
+> 
+> Test.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotestData_", foldnum, ".csv"), sep=",", header=T)
+> #For testing;
+> #Test.table <- Test.table[1:10,]
+> 
+> Train.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotrainData_", foldnum, ".csv"), sep=",", header=T)
+> > #Import foldnum for 10-fold cross validation
+> 
+> foldnum<-Sys.getenv(c('foldnum'))
+#Import foldnum for 10-fold cross validation
+> > 
+print(foldnum)
+> foldnum<-Sys.getenv(c('foldnum'))
+> print(foldnum)
+[1] "4"
+> 
+> #Import packages
+> library("sp")
+[1] "5"
+> 
+> #Import packages
+> library("sp")
+> library("spatstat")
+> library("spatstat")
+> #For testing:
+> #Train.table <- Train.table[1:10,]
+> 
+> #START BUILDING TRAIN DF
+> #begin using objects that will be overwritten
+> #create group of ONLY unique train coordinate pairs (reduces number of lines)
+> unique_coords <-  unique(Train.table[,c("long1","lat1","long2","lat2")])
+Loading required package: spatstat.data
+Loading required package: spatstat.data
+> 
+> begin.table <- unique_coords[,c("long1","lat1")]
+> begin.coord <- begin.table #copy one for coords, one for df
+> coordinates(begin.coord) <- c("long1", "lat1")
+> 
+> end.table <- unique_coords[,c("long2","lat2")]
+> end.coord <- end.table #copy one for coords, one for df
+> coordinates(end.coord) <- c("long2", "lat2")
+> 
+> registerDoMC(cores=detectCores()) 
+> 
+> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
++   spatial.p <- as(p, "SpatialLines")
++   proj4string(spatial.p) <- crs.geo 
++   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
++ }
+Loading required package: nlme
+Loading required package: nlme
+Loading required package: rpart
+Loading required package: rpart
+
+spatstat 1.63-3       (nickname: ‘Wet paint’) 
+For an introduction to spatstat, type ‘beginner’ 
+
+
+spatstat 1.63-3       (nickname: ‘Wet paint’) 
+For an introduction to spatstat, type ‘beginner’ 
+
+> library("maptools")
+> library("maptools")
+Checking rgeos availability: FALSE
+ 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
+ 	which has a restricted licence. It is disabled by default;
+ 	to enable gpclib, type gpclibPermit()
+Checking rgeos availability: FALSE
+ 	Note: when rgeos is not available, polygon geometry 	computations in maptools depend on gpclib,
+ 	which has a restricted licence. It is disabled by default;
+ 	to enable gpclib, type gpclibPermit()
+> > library("raster")
+library("raster")
+
+Attaching package: ‘raster’
+
+The following objects are masked from ‘package:spatstat’:
+
+    area, rotate, shift
+
+The following object is masked from ‘package:nlme’:
+
+    getData
+
+> library("randomForest")
 
 Attaching package: ‘raster’
 
@@ -194,7 +201,11 @@ The following object is masked from ‘package:nlme’:
 > library("randomForest")
 randomForest 4.6-14
 Type rfNews() to see new features/changes/bug fixes.
+randomForest 4.6-14
+Type rfNews() to see new features/changes/bug fixes.
 > library("gdistance")
+> library("gdistance")
+Loading required package: igraph
 Loading required package: igraph
 
 Attaching package: ‘igraph’
@@ -203,9 +214,28 @@ The following object is masked from ‘package:raster’:
 
     union
 
+
+Attaching package: ‘igraph’
+
 The following objects are masked from ‘package:spatstat’:
 
     diameter, edges, is.connected, vertices
+
+The following object is masked from ‘package:raster’:
+
+    union
+
+The following objects are masked from ‘package:stats’:
+
+    decompose, spectrum
+
+The following objects are masked from ‘package:spatstat’:
+
+    diameter, edges, is.connected, vertices
+
+The following object is masked from ‘package:base’:
+
+    union
 
 The following objects are masked from ‘package:stats’:
 
@@ -216,13 +246,17 @@ The following object is masked from ‘package:base’:
     union
 
 Loading required package: Matrix
-> #For testing:
-> #Train.table <- Train.table[1:10,]
-> 
-> #START BUILDING TRAIN DF
-> #begin using objects that will be overwritten
-> #create group of ONLY unique train coordinate pairs (reduces number of lines)
-> unique_coords <-  unique(Train.table[,c("long1","lat1","long2","lat2")])
+Loading required package: Matrix
+
+Attaching package: ‘gdistance’
+
+The following object is masked from ‘package:igraph’:
+
+    normalize
+
+> #library("SDraw")
+> #library("tidyverse")
+> library("foreach")
 
 Attaching package: ‘gdistance’
 
@@ -234,27 +268,15 @@ The following object is masked from ‘package:igraph’:
 > #library("tidyverse")
 > library("foreach")
 > library("doParallel")
+> library("doParallel")
+Loading required package: iterators
 Loading required package: iterators
 Loading required package: parallel
-> 
-> begin.table <- unique_coords[,c("long1","lat1")]
-> begin.coord <- begin.table #copy one for coords, one for df
-> coordinates(begin.coord) <- c("long1", "lat1")
+Loading required package: parallel
 > library("doMC")
-> 
-> end.table <- unique_coords[,c("long2","lat2")]
-> end.coord <- end.table #copy one for coords, one for df
-> coordinates(end.coord) <- c("long2", "lat2")
-> 
-> registerDoMC(cores=detectCores()) 
+> library("doMC")
 > library("dplyr")
-> 
-> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
-+   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
-+   spatial.p <- as(p, "SpatialLines")
-+   proj4string(spatial.p) <- crs.geo 
-+   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
-+ }
+> library("dplyr")
 
 Attaching package: ‘dplyr’
 
@@ -266,10 +288,39 @@ The following object is masked from ‘package:randomForest’:
 
     combine
 
+
+Attaching package: ‘dplyr’
+
 The following objects are masked from ‘package:raster’:
 
     intersect, select, union
 
+The following objects are masked from ‘package:igraph’:
+
+    as_data_frame, groups, union
+
+The following object is masked from ‘package:nlme’:
+
+    collapse
+
+The following object is masked from ‘package:randomForest’:
+
+    combine
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:raster’:
+
+    intersect, select, union
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> load("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeoRF_pt1.RData")
 The following object is masked from ‘package:nlme’:
 
     collapse
@@ -287,29 +338,6 @@ The following objects are masked from ‘package:base’:
 > 
 > crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
 > 
-> rmr=function(x){
-+   ## function to truly delete raster and temporary files associated with them
-+   if(class(x)=="RasterLayer"&grepl("^/tmp",x@file@name)&fromDisk(x)==T){
-+     file.remove(x@file@name,sub("grd","gri",x@file@name))
-+     rm(x)
-+   }
-+ }
-> 
-> 
-> ###############################################
-> #Plot lines as SpatialLines:
-> ###############################################
-> 
-> #Plot straight lines for first iteration of RF
-> 
-> #need to download test
-> 
-> Test.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotestData_", foldnum, ".csv"), sep=",", header=T)
-> #For testing;
-> #Test.table <- Test.table[1:10,]
-> 
-> Train.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotrainData_", foldnum, ".csv"), sep=",", header=T)
-> 
 > crs.geo <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs") # ... add coordinate system
 > 
 > rmr=function(x){
@@ -330,6 +358,29 @@ The following objects are masked from ‘package:base’:
 > #need to download test
 > 
 > Test.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotestData_", foldnum, ".csv"), sep=",", header=T)
+> 
+> rmr=function(x){
++   ## function to truly delete raster and temporary files associated with them
++   if(class(x)=="RasterLayer"&grepl("^/tmp",x@file@name)&fromDisk(x)==T){
++     file.remove(x@file@name,sub("grd","gri",x@file@name))
++     rm(x)
++   }
++ }
+> 
+> 
+> ###############################################
+> #Plot lines as SpatialLines:
+> ###############################################
+> 
+> #Plot straight lines for first iteration of RF
+> 
+> #need to download test
+> 
+> Test.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotestData_", foldnum, ".csv"), sep=",", header=T)
+> #For testing;
+> #Test.table <- Test.table[1:10,]
+> 
+> Train.table <- read.table(file=paste0("/home/fas/caccone/apb56/project/GPDGENCON/DPS/CV/GeotrainData_", foldnum, ".csv"), sep=",", header=T)
 > #For testing;
 > #Test.table <- Test.table[1:10,]
 > 
@@ -341,23 +392,6 @@ The following objects are masked from ‘package:base’:
 > #begin using objects that will be overwritten
 > #create group of ONLY unique train coordinate pairs (reduces number of lines)
 > unique_coords <-  unique(Train.table[,c("long1","lat1","long2","lat2")])
-> 
-> begin.table <- unique_coords[,c("long1","lat1")]
-> begin.coord <- begin.table #copy one for coords, one for df
-> coordinates(begin.coord) <- c("long1", "lat1")
-> 
-> end.table <- unique_coords[,c("long2","lat2")]
-> end.coord <- end.table #copy one for coords, one for df
-> coordinates(end.coord) <- c("long2", "lat2")
-> 
-> registerDoMC(cores=detectCores()) 
-> 
-> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
-+   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
-+   spatial.p <- as(p, "SpatialLines")
-+   proj4string(spatial.p) <- crs.geo 
-+   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
-+ }
 > #For testing:
 > #Train.table <- Train.table[1:10,]
 > 
@@ -376,9 +410,191 @@ The following objects are masked from ‘package:base’:
 > 
 > registerDoMC(cores=detectCores()) 
 > 
+> begin.table <- unique_coords[,c("long1","lat1")]
+> begin.coord <- begin.table #copy one for coords, one for df
+> coordinates(begin.coord) <- c("long1", "lat1")
+> 
+> end.table <- unique_coords[,c("long2","lat2")]
+> end.coord <- end.table #copy one for coords, one for df
+> coordinates(end.coord) <- c("long2", "lat2")
+> 
+> registerDoMC(cores=detectCores()) 
+> 
 > StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
 +   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
 +   spatial.p <- as(p, "SpatialLines")
 +   proj4string(spatial.p) <- crs.geo 
 +   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
 + }
+> 
+> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
++   spatial.p <- as(p, "SpatialLines")
++   proj4string(spatial.p) <- crs.geo 
++   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
++ }
+> 
+> gc() 
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  2848432 152.2    4725575 252.4  4725575 252.4
+Vcells 19528499 149.0   32224835 245.9 22165010 169.2
+> #end using objects that will be overwritten
+> 
+> StraightMeanUniqDF.train <- as.data.frame(StraightMeanUniq)
+> 
+> #bind unique coords to unique lines
+> StraightMeanUniqDF.train <- cbind(unique_coords, StraightMeanUniqDF.train)
+> 
+> #use left_join to merge tables by coords in order to get the distance for each pair/line
+> StraightMeanDF.train <- left_join(StraightMeanUniqDF.train, Train.table, by = c("long1","lat1","long2","lat2"))
+> 
+> #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
+> StraightMeanDF.train <- StraightMeanDF.train[,c(names(env),"value")]
+> 
+> #remove any NAs for random forest
+> StraightMeanDF.train <- StraightMeanDF.train[complete.cases(StraightMeanDF.train),]
+> 
+> #END BUILDING TRAIN DF
+> 
+> #START BUILDING TEST DF
+> #begin using objects that will be overwritten (object names will be reused for testing)
+> #create group of ONLY unique test coordinate pairs (reduces number of lines)
+> unique_coords <-  unique(Test.table[,c("long1","lat1","long2","lat2")])
+> 
+> begin.table <- unique_coords[,c("long1","lat1")]
+> begin.coord <- begin.table #copy one for coords, one for df
+> coordinates(begin.coord) <- c("long1", "lat1")
+> 
+> end.table <- unique_coords[,c("long2","lat2")]
+> end.coord <- end.table #copy one for coords, one for df
+> coordinates(end.coord) <- c("long2", "lat2")
+> 
+> registerDoMC(cores=detectCores()) 
+> 
+> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
++   spatial.p <- as(p, "SpatialLines")
++   proj4string(spatial.p) <- crs.geo 
++   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
++ }
+> 
+> gc() 
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  2848432 152.2    4725562 252.4  4725562 252.4
+Vcells 19528503 149.0   32224838 245.9 22165053 169.2
+> #end using objects that will be overwritten
+> 
+> StraightMeanUniqDF.train <- as.data.frame(StraightMeanUniq)
+> 
+> #bind unique coords to unique lines
+> StraightMeanUniqDF.train <- cbind(unique_coords, StraightMeanUniqDF.train)
+> 
+> #use left_join to merge tables by coords in order to get the distance for each pair/line
+> StraightMeanDF.train <- left_join(StraightMeanUniqDF.train, Train.table, by = c("long1","lat1","long2","lat2"))
+> 
+> #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
+> StraightMeanDF.train <- StraightMeanDF.train[,c(names(env),"value")]
+> 
+> #remove any NAs for random forest
+> StraightMeanDF.train <- StraightMeanDF.train[complete.cases(StraightMeanDF.train),]
+> 
+> #END BUILDING TRAIN DF
+> 
+> #START BUILDING TEST DF
+> #begin using objects that will be overwritten (object names will be reused for testing)
+> #create group of ONLY unique test coordinate pairs (reduces number of lines)
+> unique_coords <-  unique(Test.table[,c("long1","lat1","long2","lat2")])
+> 
+> begin.table <- unique_coords[,c("long1","lat1")]
+> begin.coord <- begin.table #copy one for coords, one for df
+> coordinates(begin.coord) <- c("long1", "lat1")
+> 
+> end.table <- unique_coords[,c("long2","lat2")]
+> end.coord <- end.table #copy one for coords, one for df
+> coordinates(end.coord) <- c("long2", "lat2")
+> 
+> registerDoMC(cores=detectCores()) 
+> 
+> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
++   spatial.p <- as(p, "SpatialLines")
++   proj4string(spatial.p) <- crs.geo 
++   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
++ }
+> 
+> gc() 
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  2848432 152.2    4725628 252.4  4725628 252.4
+Vcells 19528498 149.0   32224838 245.9 22165020 169.2
+> #end using objects that will be overwritten
+> 
+> StraightMeanUniqDF.train <- as.data.frame(StraightMeanUniq)
+> 
+> #bind unique coords to unique lines
+> StraightMeanUniqDF.train <- cbind(unique_coords, StraightMeanUniqDF.train)
+> 
+> #use left_join to merge tables by coords in order to get the distance for each pair/line
+> StraightMeanDF.train <- left_join(StraightMeanUniqDF.train, Train.table, by = c("long1","lat1","long2","lat2"))
+> 
+> #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
+> StraightMeanDF.train <- StraightMeanDF.train[,c(names(env),"value")]
+> 
+> #remove any NAs for random forest
+> StraightMeanDF.train <- StraightMeanDF.train[complete.cases(StraightMeanDF.train),]
+> 
+> #END BUILDING TRAIN DF
+> 
+> #START BUILDING TEST DF
+> #begin using objects that will be overwritten (object names will be reused for testing)
+> #create group of ONLY unique test coordinate pairs (reduces number of lines)
+> unique_coords <-  unique(Test.table[,c("long1","lat1","long2","lat2")])
+> 
+> begin.table <- unique_coords[,c("long1","lat1")]
+> begin.coord <- begin.table #copy one for coords, one for df
+> coordinates(begin.coord) <- c("long1", "lat1")
+> 
+> end.table <- unique_coords[,c("long2","lat2")]
+> end.coord <- end.table #copy one for coords, one for df
+> coordinates(end.coord) <- c("long2", "lat2")
+> 
+> registerDoMC(cores=detectCores()) 
+> 
+> StraightMeanUniq <- foreach(r=1:nrow(begin.table), .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++   p <- psp(begin.table[r,1], begin.table[r,2], end.table[r,1], end.table[r,2], owin(range(c(begin.table[,1], end.table[,1])), range(c(begin.table[,2], end.table[,2]))))
++   spatial.p <- as(p, "SpatialLines")
++   proj4string(spatial.p) <- crs.geo 
++   data.frame(raster::extract(env, spatial.p, fun=mean, na.rm=TRUE))
++ }
+> gc() 
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  2857455 152.7    4725575 252.4  4725575 252.4
+Vcells 22674536 173.0   38749802 295.7 31986612 244.1
+> 
+> #end using objects that will be overwritten
+> StraightMeanUniqDF.test <- as.data.frame(StraightMeanUniq)
+> 
+> #bind unique coords to unique lines
+> StraightMeanUniqDF.test <- cbind(unique_coords, StraightMeanUniqDF.test)
+> 
+> #use left_join to merge tables by coords in order to get the distance for each pair/line
+> StraightMeanDF.test <- left_join(StraightMeanUniqDF.test, Test.table, by = c("long1","lat1","long2","lat2"))
+> 
+> #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
+> StraightMeanDF.test<- StraightMeanDF.test[,c(names(env),"value")]
+> 
+> #remove any NAs for random forest
+> StraightMeanDF.test <- StraightMeanDF.test[complete.cases(StraightMeanDF.test),]
+> 
+> set.seed(NULL)
+> 
+> #tune RF
+> tune_x <- StraightMeanDF.train[,names(env)]
+> tune_y <- StraightMeanDF.train[,c("value")]
+> bestmtry <- tuneRF(tune_x, tune_y, stepFactor=1.5, improve=1e-5, ntree=500)
+mtry = 9  OOB error = 0.00943217 
+Searching left ...
+mtry = 6 	OOB error = 0.009432288 
+-1.252563e-05 1e-05 
+Searching right ...
+mtry = 13 	OOB error = 0.009432002 
+1.784483e-05 1e-05 
