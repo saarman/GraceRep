@@ -598,3 +598,277 @@ mtry = 6 	OOB error = 0.009432288
 Searching right ...
 mtry = 13 	OOB error = 0.009432002 
 1.784483e-05 1e-05 
+> gc() 
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  2857434 152.7    4725628 252.4  4725628 252.4
+Vcells 22673639 173.0   38749805 295.7 31987297 244.1
+> 
+> #end using objects that will be overwritten
+> StraightMeanUniqDF.test <- as.data.frame(StraightMeanUniq)
+> 
+> #bind unique coords to unique lines
+> StraightMeanUniqDF.test <- cbind(unique_coords, StraightMeanUniqDF.test)
+> 
+> #use left_join to merge tables by coords in order to get the distance for each pair/line
+> StraightMeanDF.test <- left_join(StraightMeanUniqDF.test, Test.table, by = c("long1","lat1","long2","lat2"))
+> 
+> #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
+> StraightMeanDF.test<- StraightMeanDF.test[,c(names(env),"value")]
+> 
+> #remove any NAs for random forest
+> StraightMeanDF.test <- StraightMeanDF.test[complete.cases(StraightMeanDF.test),]
+> 
+> set.seed(NULL)
+> 
+> #tune RF
+> tune_x <- StraightMeanDF.train[,names(env)]
+> tune_y <- StraightMeanDF.train[,c("value")]
+> bestmtry <- tuneRF(tune_x, tune_y, stepFactor=1.5, improve=1e-5, ntree=500)
+> gc() 
+           used  (Mb) gc trigger  (Mb) max used  (Mb)
+Ncells  2857431 152.7    4725562 252.4  4725562 252.4
+Vcells 22673631 173.0   38749805 295.7 31986941 244.1
+> 
+> #end using objects that will be overwritten
+> StraightMeanUniqDF.test <- as.data.frame(StraightMeanUniq)
+> 
+> #bind unique coords to unique lines
+> StraightMeanUniqDF.test <- cbind(unique_coords, StraightMeanUniqDF.test)
+> 
+> #use left_join to merge tables by coords in order to get the distance for each pair/line
+> StraightMeanDF.test <- left_join(StraightMeanUniqDF.test, Test.table, by = c("long1","lat1","long2","lat2"))
+> 
+> #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
+> StraightMeanDF.test<- StraightMeanDF.test[,c(names(env),"value")]
+> 
+> #remove any NAs for random forest
+> StraightMeanDF.test <- StraightMeanDF.test[complete.cases(StraightMeanDF.test),]
+> 
+> set.seed(NULL)
+> 
+> #tune RF
+> tune_x <- StraightMeanDF.train[,names(env)]
+> tune_y <- StraightMeanDF.train[,c("value")]
+> bestmtry <- tuneRF(tune_x, tune_y, stepFactor=1.5, improve=1e-5, ntree=500)
+mtry = 19 	OOB error = 0.009432471 
+-4.969173e-05 1e-05 
+> mtry_opt <- bestmtry[,"mtry"][which.min(bestmtry[,"OOBError"])]
+> 
+> Straight_RF = randomForest(value ~ ., importance=TRUE, mtry = mtry_opt, na.action=na.omit, data=StraightMeanDF.train)
+mtry = 9  OOB error = 0.009419398 
+Searching left ...
+mtry = 9  OOB error = 0.009446059 
+Searching left ...
+> 
+> gc()
+           used  (Mb) gc trigger   (Mb)  max used   (Mb)
+Ncells  2979203 159.2    4725575  252.4   4725575  252.4
+Vcells 27048817 206.4  543313231 4145.2 556441733 4245.4
+> 
+> #Define empty vectors
+> RSQ_vec = c()
+> RMSE_vec = c()
+> RMSE2_vec = c()
+> MAE_vec = c()
+> MAE2_vec = c()
+> MAE3_vec = c()
+> Cor1_vec  = c()
+> Cor2_vec  = c()
+> 
+> #Validation parameters
+> RSQ = tail(Straight_RF$rsq ,1 )
+> RMSE = sqrt(tail(Straight_RF$mse ,1 ))
+> RMSE2 = sqrt(mean((predict(Straight_RF, StraightMeanDF.test) - StraightMeanDF.test$value)^2))
+> MAE = mean(abs(Straight_RF$predicted - StraightMeanDF.train$value))
+> MAE2 =  mean(abs(predict(Straight_RF, StraightMeanDF.train) - StraightMeanDF.train$value))
+> MAE3 = mean(abs(predict(Straight_RF, StraightMeanDF.test) - StraightMeanDF.test$value))
+> Cor1 = cor(predict(Straight_RF, StraightMeanDF.train), StraightMeanDF.train$value)
+> Cor2 = cor(predict(Straight_RF, StraightMeanDF.test), StraightMeanDF.test$value)
+> 
+> #Add straight line parameters to the vectors
+> RSQ_vec   = c(RSQ)
+> RMSE_vec   = c(RMSE)
+> RMSE2_vec  = c(RMSE2)
+> MAE_vec = c(MAE)
+> MAE2_vec = c(MAE2)
+> MAE3_vec = c(MAE3)
+> Cor1_vec  = c(Cor1)
+> Cor2_vec  = c(Cor2)
+> 
+> fit = lm(Straight_RF$predicted ~ StraightMeanDF.train$value)
+> pdf(paste0("/home/fas/caccone/nps25/project/Gpd_GMODEL/GeoLinData_Run",foldnum,"_StraightRF_TrainingScatter.pdf"), 5, 5)
+> plot(StraightMeanDF.train$value, Straight_RF$predicted,  xlab ="Observed GenDis* (training)", ylab="Predicted GenDis")
+> legend("bottomright", legend=c(paste0("Pearson correlation = ", round(Cor2,3))), cex=0.7)
+> dev.off()
+pdf 
+  2 
+> 
+> fit = lm(predict(Straight_RF, StraightMeanDF.test) ~ StraightMeanDF.test$value)
+> pdf(paste0("/home/fas/caccone/nps25/project/Gpd_GMODEL/GeoLinData_Run",foldnum,"_StraightRF_ValidScatter.pdf"), 5, 5)
+> plot(StraightMeanDF.test$value, predict(Straight_RF, StraightMeanDF.test),  xlab ="Observed GenDis (testing)", ylab="Predicted GenDis")
+> legend("bottomright", legend=c(paste0("Pearson correlation = ", round(Cor2,3))), cex=0.7)
+> dev.off()
+pdf 
+  2 
+> 
+> StraightPred <- predict(env, Straight_RF)
+> 
+> print("first prediction resistance surface done")
+[1] "first prediction resistance surface done"
+> 
+> pred.cond <- StraightPred #build conductance surface (DO NOT TAKE INVERSE FOR DPS - proportion of alleles shared is already a measure of connectivity)
+> 
+> save.image(paste0("/home/fas/caccone/nps25/project/Gpd_GMODEL/GeoLinDPSData_beforeLCP_Fold",foldnum,".RData"))
+> 
+> #Prepare points for use in least cost path loops - Training
+> unique_train <-  unique(Train.table[,c("long1","lat1","long2","lat2")])
+> P.points1.train <- SpatialPoints(unique_train[,c("long1","lat1")])
+> P.points2.train <- SpatialPoints(unique_train[,c("long2","lat2")])
+> proj4string(P.points1.train) <- crs.geo
+> proj4string(P.points2.train) <- crs.geo
+> NumPairs.train <- length(P.points1.train)
+> 
+> 
+> #Prepare points for use in least cost path loops - Testing
+> unique_test <-  unique(Test.table[,c("long1","lat1","long2","lat2")])
+> P.points1.test <- SpatialPoints(unique_test[,c("long1","lat1")])
+> P.points2.test <- SpatialPoints(unique_test[,c("long2","lat2")])
+> proj4string(P.points1.test) <- crs.geo
+> proj4string(P.points2.test) <- crs.geo
+> NumPairs.test    <- length(P.points1.test)
+> 
+> #get parallelization set up
+> nw <- detectCores()
+> # cl <- makePSOCKcluster(nw) # is create multiple copy and it is usefull for works in multiple node
+> # registerDoParallel(cl)     # is create multiple copy and it is usefull for works in multiple node
+> registerDoMC(cores=nw)       # is create forks of the data good; for one node many cpu
+> 
+> print("cores registered")
+[1] "cores registered"
+> 
+> print("starting loops")
+[1] "starting loops"
+> 
+> for (it in 1:10) {
++   
++   rm(trNAm1C)
++   gc()
++   
++   trNAm1 <- transition(pred.cond, transitionFunction=mean, directions=8) #make transitional matrix
++   
++   print("transition matrix done")
++   
++   trNAm1C <- geoCorrection(trNAm1, type="c") 
++   
++   rm(trNAm1)
++   gc()
++   
++   
++   #Extract mean value from LCP for TRAINING data
++   
++   UniqueLcpLoop.train <- foreach(r=1:NumPairs.train, .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++     if (extent(P.points1.train[r]) != extent(P.points2.train[r])){
++       Ato <- shortestPath(trNAm1C, P.points1.train[r], P.points2.train[r]  , output="SpatialLines")
++     } else {
++       Ato <- P.points1.train[r]
++     }
++     data.frame(raster::extract(env, Ato, fun=mean, na.rm=TRUE))
++   }
++   
++   UniqueLcpLoopDF.train <- as.data.frame(UniqueLcpLoop.train)
++   
++   #bind unique coords to unique lines
++   UniqueLcpLoopDF.train <- cbind(unique_train, UniqueLcpLoopDF.train)
++   
++   #use left_join to merge tables by coords in order to get the distance for each pair/line
++   LcpLoopDF.train <- left_join(UniqueLcpLoopDF.train, Train.table, by = c("long1","lat1","long2","lat2"))
++   
++   #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
++   LcpLoopDF.train <- LcpLoopDF.train[,c(names(env),"value")]
++   
++   #remove any NAs for random forest
++   LcpLoopDF.train <- LcpLoopDF.train[complete.cases(LcpLoopDF.train),]
++   
++   #Extract mean value from LCP for TESTING data
++   UniqueLcpLoop.test <- foreach(r=1:NumPairs.test, .combine='rbind', .packages=c('raster', 'gdistance')  ,   .inorder=TRUE   ) %dopar% {
++     if (extent(P.points1.test[r]) != extent(P.points2.test[r])){
++       Ato <- shortestPath(trNAm1C, P.points1.test[r], P.points2.test[r]  , output="SpatialLines")
++     } else {
++       Ato <- P.points1.test[r]
++     }
++     data.frame(raster::extract(env, Ato, fun=mean, na.rm=TRUE))
++   }
++   
++   UniqueLcpLoopDF.test <- as.data.frame(UniqueLcpLoop.test)
++   
++   #bind unique coords to unique lines
++   UniqueLcpLoopDF.test <- cbind(unique_test, UniqueLcpLoopDF.test)
++   
++   #use left_join to merge tables by coords in order to get the distance for each pair/line
++   LcpLoopDF.test <- left_join(UniqueLcpLoopDF.test, Test.table, by = c("long1","lat1","long2","lat2"))
++   
++   #subset to retain only necessary vars (remove long/lat, var1/var2, etc.) before building models
++   LcpLoopDF.test <- LcpLoopDF.test[,c(names(env),"value")]
++   
++   #remove any NAs for random forest
++   LcpLoopDF.test <- LcpLoopDF.test[complete.cases(LcpLoopDF.test),]
++   
++   tune_x <- LcpLoopDF.train[,names(env)]
++   tune_y <- LcpLoopDF.train[,c("value")]
++   bestmtry <- tuneRF(tune_x, tune_y, stepFactor=1.5, improve=1e-5, ntree=500)
++   mtry_opt <- bestmtry[,"mtry"][which.min(bestmtry[,"OOBError"])]
++   
++   LCP_RF = randomForest(value ~ ., importance=TRUE, mtry=mtry_opt, na.action=na.omit, data=LcpLoopDF.train)
++   
++   assign(paste0("LCP_RF", it), LCP_RF )
++   
++   print(paste0("finishing RF for iteration #", it))
++   
++   gc()
++   
++   rm(trNAm1C)
++   
++   gc()
++   
++   #add validation parameters here
++   RSQ = tail(LCP_RF$rsq ,1 )
++   RMSE = sqrt(tail(LCP_RF$mse ,1 ))
++   RMSE2 = sqrt(mean((predict(LCP_RF, LcpLoopDF.test) - LcpLoopDF.test$value)^2))
++   MAE = mean(abs(LCP_RF$predicted - LcpLoopDF.train$value))
++   MAE2 =  mean(abs(predict(LCP_RF, LcpLoopDF.train) - LcpLoopDF.train$value))
++   MAE3 = mean(abs(predict(LCP_RF, LcpLoopDF.test) - LcpLoopDF.test$value))
++   Cor1 = cor(predict(LCP_RF, LcpLoopDF.train), LcpLoopDF.train$value)
++   Cor2 = cor(predict(LCP_RF, LcpLoopDF.test), LcpLoopDF.test$value)
++   
++   RSQ_vec   = append(RSQ_vec, RSQ)
++   RMSE_vec   = append(RMSE_vec, RMSE)
++   RMSE2_vec  = append(RMSE2_vec, RMSE2)
++   MAE_vec   = append(MAE_vec, MAE)
++   MAE2_vec  = append(MAE2_vec, MAE2)
++   MAE3_vec  = append(MAE3_vec, MAE3)
++   Cor1_vec  = append(Cor1_vec, Cor1)
++   Cor2_vec  = append(Cor2_vec, Cor2)
++   
++   
++   pred = predict(env, LCP_RF)
++   
++   print(paste0("finishing prediction for iteration #", it))
++   
++   
++   rm(LCP_RF)
++   
++   assign(paste0("pred", it), pred)
++   
++   pred.cond <- pred #build conductance surface (DO NOT TAKE INVERSE FOR DPS - proportion of alleles shared is already a measure of connectivity)
++   
++   rmr(pred)
++   
++   gc()
++   
++   print(paste0("end of loop for iteration #", it))
++   
++ }  
+[1] "transition matrix done"
+slurmstepd: error: *** JOB 51042976 ON bigmem03 CANCELLED AT 2020-03-05T21:52:05 ***
+slurmstepd: error: *** JOB 51042977 ON bigmem03 CANCELLED AT 2020-03-05T21:52:05 ***
+slurmstepd: error: *** JOB 51042978 ON p08r06n33 CANCELLED AT 2020-03-05T21:52:05 ***
